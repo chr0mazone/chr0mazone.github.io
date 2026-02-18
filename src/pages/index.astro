@@ -1,0 +1,76 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { ArrowRight } from '@lucide/astro';
+---
+
+<BaseLayout title="hackerlab" description="Pentesting, red teaming, CTF writeups and security research.">
+  <main class="home-main">
+    <div class="hero-card">
+      <!-- Top bar -->
+      <div class="hero-card-topbar">
+        <div class="topbar-status">
+          <span class="status-dot"></span>
+          <span>ONLINE</span>
+          <span style="color: var(--color-border-hover)">//</span>
+          <span>SECURE</span>
+          <span style="color: var(--color-border-hover)">//</span>
+          <span id="live-clock">--:--:--</span>
+        </div>
+        <div style="color: var(--color-border-hover); font-size: 0.7rem;">root@hackerlab:~$</div>
+      </div>
+
+      <!-- Body -->
+      <div class="hero-card-body">
+        <!-- Avatar -->
+        <div class="hero-avatar-wrap">
+          <div class="hero-avatar-frame">
+            <!-- Replace with <img src="/images/avatar.jpg" alt="avatar" class="hero-avatar" /> -->
+            <!-- <div class="hero-avatar-placeholder">
+              <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.5" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div> -->
+            <img src="https://avatars.githubusercontent.com/u/210249546?v=4" alt="avatar" class="hero-avatar" />
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="hero-content">
+          <div class="hero-content-label">WHOAMI</div>
+          <h1 class="hero-name">Arjit Praveen</h1>
+          <div class="hero-role">
+            <span class="prompt">$</span>
+            Cybersec Researcher &amp; CTF Player
+          </div>
+          <p class="hero-bio">
+            Cybersecurity researcher, CTF player, and tool builder. Diving deep into
+            offensive security, network analysis, and reverse engineering.
+            Sharing writeups, tools, and research here.
+          </p>
+          <div class="hero-buttons">
+            <a href="/blog" class="btn btn-primary">
+              VIEW BLOG
+              <ArrowRight size={14} stroke-width={2.5} aria-hidden="true" />
+            </a>
+            <a href="/about" class="btn btn-outline">ABOUT ME</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</BaseLayout>
+
+<script>
+  function updateClock() {
+    const el = document.getElementById('live-clock');
+    if (!el) return;
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2, '0');
+    const m = String(now.getMinutes()).padStart(2, '0');
+    const s = String(now.getSeconds()).padStart(2, '0');
+    el.textContent = `${h}:${m}:${s}`;
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+</script>

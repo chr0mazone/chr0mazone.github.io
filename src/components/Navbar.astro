@@ -1,0 +1,82 @@
+---
+import { Terminal, FileText, User, Menu, X } from '@lucide/astro';
+
+const currentPath = Astro.url.pathname;
+const navLinks = [
+  { href: '/',      label: 'Home',  Icon: Terminal },
+  { href: '/blog',  label: 'Blog',  Icon: FileText },
+  { href: '/about', label: 'About', Icon: User },
+];
+---
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a href="/" class="navbar-logo">
+      <span class="logo-bracket">[</span>
+      <Terminal size={18} stroke-width={2} aria-hidden="true" />
+      arjit
+      <span class="logo-bracket">]</span>
+    </a>
+
+    <ul class="navbar-links" id="navbar-links" role="list">
+      {navLinks.map(({ href, label, Icon }) => (
+        <li>
+          <a
+            href={href}
+            aria-current={
+              currentPath === href || (href !== '/' && currentPath.startsWith(href))
+                ? 'page' : undefined
+            }
+          >
+            <Icon size={14} stroke-width={2} aria-hidden="true" />
+            {label}
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <button
+      class="nav-hamburger"
+      id="nav-hamburger"
+      aria-label="Toggle navigation"
+      aria-expanded="false"
+      aria-controls="navbar-links"
+    >
+      <span id="hamburger-icon"><Menu size={20} aria-hidden="true" /></span>
+      <span id="close-icon"    style="display:none;"><X size={20} aria-hidden="true" /></span>
+    </button>
+  </div>
+</nav>
+
+<script>
+  const btn   = document.getElementById('nav-hamburger');
+  const menu  = document.getElementById('navbar-links');
+  const hIcon = document.getElementById('hamburger-icon');
+  const xIcon = document.getElementById('close-icon');
+
+  const isOpen = () => menu?.classList.contains('open');
+
+  const open = () => {
+    menu?.classList.add('open');
+    btn?.setAttribute('aria-expanded', 'true');
+    if (hIcon) hIcon.style.display = 'none';
+    if (xIcon) xIcon.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+  };
+
+  const close = () => {
+    menu?.classList.remove('open');
+    btn?.setAttribute('aria-expanded', 'false');
+    if (hIcon) hIcon.style.display = 'block';
+    if (xIcon) xIcon.style.display = 'none';
+    document.body.style.overflow = '';
+  };
+
+  btn?.addEventListener('click', () => isOpen() ? close() : open());
+  menu?.querySelectorAll('a').forEach(a => a.addEventListener('click', close));
+  document.addEventListener('click', e => {
+    if (isOpen() && !btn?.contains(e.target as Node) && !menu?.contains(e.target as Node)) close();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+  window.addEventListener('resize', () => { if (window.innerWidth > 768) close(); });
+</script>

@@ -1,0 +1,24 @@
+# Build output
+dist/
+.output/
+
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Logs
+npm-debug.log*
+pnpm-debug.log*
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Astro
+.astro/

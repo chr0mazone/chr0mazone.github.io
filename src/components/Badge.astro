@@ -1,0 +1,75 @@
+---
+import {
+  Cpu, Code, Globe, Zap, Flag, Shield, Bug, Crosshair,
+  Search, Lock, Eye, Wifi, Terminal, Monitor, Server,
+  Tag, Hash, BookOpen, Network, Sword, Key
+} from '@lucide/astro';
+
+interface Props {
+  tag: string;
+  color?: string;
+  icon?: string;
+  clickable?: boolean;
+  active?: boolean;
+  href?: string;
+  class?: string;
+}
+
+const { tag, color, icon, clickable, active, href, class: className } = Astro.props;
+
+const specialBadges: Record<string, { color: string; icon: string; label?: string }> = {
+  rust:              { color: 'orange',  icon: 'Cpu',       label: 'rust' },
+  python:            { color: 'blue',    icon: 'Code',      label: 'python' },
+  web:               { color: 'blue',    icon: 'Globe',     label: 'web' },
+  pwn:               { color: 'red',     icon: 'Zap',       label: 'pwn' },
+  ctf:               { color: 'purple',  icon: 'Flag',      label: 'ctf' },
+  htb:               { color: 'green',   icon: 'Shield',    label: 'htb' },
+  malware:           { color: 'red',     icon: 'Bug',       label: 'malware' },
+  'red-team':        { color: 'red',     icon: 'Crosshair', label: 'red team' },
+  pentest:           { color: 'yellow',  icon: 'Search',    label: 'pentest' },
+  crypto:            { color: 'purple',  icon: 'Lock',      label: 'crypto' },
+  osint:             { color: 'accent',  icon: 'Eye',       label: 'osint' },
+  network:           { color: 'blue',    icon: 'Wifi',      label: 'network' },
+  linux:             { color: 'green',   icon: 'Terminal',  label: 'linux' },
+  windows:           { color: 'blue',    icon: 'Monitor',   label: 'windows' },
+  'active-directory':{ color: 'yellow',  icon: 'Server',    label: 'AD' },
+  recon:             { color: 'accent',  icon: 'Search',    label: 'recon' },
+  passive:           { color: 'blue',    icon: 'Eye',       label: 'passive' },
+  privesc:           { color: 'red',     icon: 'Zap',       label: 'privesc' },
+  bludit:            { color: 'orange',  icon: 'BookOpen',  label: 'bludit' },
+  cve:               { color: 'red',     icon: 'Bug',       label: 'cve' },
+  picoctf:           { color: 'purple',  icon: 'Flag',      label: 'picoctf' },
+};
+
+const special = specialBadges[tag.toLowerCase()];
+const resolvedColor = color || special?.color || '';
+const resolvedIcon  = icon  || special?.icon;
+const resolvedLabel = special?.label || tag;
+
+// Map icon name string → component
+const iconMap: Record<string, any> = {
+  Cpu, Code, Globe, Zap, Flag, Shield, Bug, Crosshair,
+  Search, Lock, Eye, Wifi, Terminal, Monitor, Server,
+  Tag, Hash, BookOpen, Network, Sword, Key,
+};
+
+const IconComponent = resolvedIcon ? iconMap[resolvedIcon] : null;
+const El = href ? 'a' : 'span';
+---
+
+<El
+  href={href}
+  class:list={[
+    'badge',
+    resolvedColor ? `badge-${resolvedColor}` : '',
+    clickable && 'clickable',
+    active && 'active',
+    className,
+  ]}
+>
+  {IconComponent
+    ? <IconComponent size={11} stroke-width={2} aria-hidden="true" />
+    : <Hash size={10} stroke-width={2} aria-hidden="true" style="opacity:0.6" />
+  }
+  {resolvedLabel}
+</El>

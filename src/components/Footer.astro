@@ -1,0 +1,26 @@
+---
+import { Github, Twitter, Linkedin, Youtube, MessageCircle, Mail, Rss } from '@lucide/astro';
+import { socials } from '../data/projects';
+
+const year = new Date().getFullYear();
+
+const iconMap = { github: Github, twitter: Twitter, linkedin: Linkedin, youtube: Youtube, discord: MessageCircle, mail: Mail, rss: Rss };
+---
+
+<footer class="footer">
+  <div class="footer-inner">
+    <span class="footer-copy">
+      &copy; {year} <span class="footer-brand">Arjit Praveen</span>
+    </span>
+    <nav class="footer-socials" aria-label="Social links">
+      {socials.map(({ label, href, icon }) => {
+        const Icon = iconMap[icon] ?? Github;
+        return (
+          <a href={href} target={href.startsWith('mailto') ? undefined : '_blank'} rel="noopener noreferrer" aria-label={label} class="footer-social-link">
+            <Icon size={16} stroke-width={2} aria-hidden="true" />
+          </a>
+        );
+      })}
+    </nav>
+  </div>
+</footer>

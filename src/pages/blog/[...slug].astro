@@ -1,0 +1,62 @@
+---
+// src/pages/blog/[...slug].astro
+import { getCollection, getEntry } from 'astro:content';
+import PostLayout from '../../layouts/PostLayout.astro';
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+
+  return allPosts.map(post => {
+    return {
+      params: { slug: post.slug },
+      props: { post },
+    };
+  });
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+
+// Determine the parent folder slug
+const slugParts = post.slug.split('/');
+const parentSlug = slugParts[0];
+const isIndex = slugParts.length === 1 || slugParts[1] === 'index';
+
+// Get all posts in same "series" (same parent folder or same single-file)
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+const siblings = allPosts.filter(p => p.slug.startsWith(parentSlug + '/') || p.slug === parentSlug);
+
+// Build subpost nav list
+const subposts = siblings
+  .sort((a, b) => {
+    // index first, then alphabetical
+    const aIsIndex = a.slug === parentSlug || a.slug.endsWith('/index');
+    const bIsIndex = b.slug === parentSlug || b.slug.endsWith('/index');
+    if (aIsIndex) return -1;
+    if (bIsIndex) return 1;
+    return a.slug.localeCompare(b.slug);
+  })
+  .map(p => {
+    const parts = p.slug.split('/');
+    const subSlug = parts.length > 1 ? parts[1] : 'index';
+    const href = parts.length === 1
+      ? `/blog/${p.slug}`
+      : p.slug.endsWith('/index')
+        ? `/blog/${parts[0]}`
+        : `/blog/${p.slug}`;
+    return { slug: subSlug, title: p.data.title, href };
+  });
+---
+
+<PostLayout
+  title={post.data.title}
+  description={post.data.description}
+  date={post.data.date}
+  tags={post.data.tags}
+  image={post.data.image}
+  parentSlug={parentSlug}
+  currentSlug={post.slug}
+  subposts={subposts.length > 1 ? subposts : []}
+>
+  <Content />
+</PostLayout>

@@ -1,0 +1,76 @@
+---
+title: "HTB Writeup: Blunder"
+description: "A walkthrough of HackTheBox machine Blunder — covering recon, bruteforce bypass, CVE exploitation, and privilege escalation via sudo misconfig."
+date: 2024-09-15
+tags: ["htb", "linux", "web", "privesc", "bludit"]
+image: "https://imgs.search.brave.com/C6niELCnHReoAtCtKWrXRUxUQ_AH3IbcYeM4OXm_X_Y/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9wbGF0/Zm9ybS50aGV2ZXJn/ZS5jb20vd3AtY29u/dGVudC91cGxvYWRz/L3NpdGVzLzIvY2hv/cnVzL3VwbG9hZHMv/Y2hvcnVzX2Fzc2V0/L2ZpbGUvMTQ0MzU2/MDkvcmlwcGxlLWRv/dC16ZXJvLjE0MTk5/Nzk4NTAuanBnP3F1/YWxpdHk9OTAmc3Ry/aXA9YWxsJmNyb3A9/MCwyLjkwNjU0ODkz/MzAzOSwxMDAsOTQu/MTg2OTAyMTMzOTIy/Jnc9MjQwMA"
+---
+
+import Callout from '../../../components/Callout.astro';
+
+## Attack Path
+
+```mermaid
+graph LR
+    A-->B
+```
+
+<Callout type="note" title="Einstein's dope ass equation" collapsed="false">
+$$
+E = mc^2
+$$
+<Callout type="note" title="Einstein's dope ass equation II">
+$$
+E^2 = (mc^2)^2 + (pc)^2
+$$
+</Callout>
+</Callout>
+
+## Overview
+
+Blunder is an easy-rated Linux box on HackTheBox. The attack chain involves:
+
+1. Directory enumeration → find a Bludit CMS installation
+2. CSRF bypass on the login brute-force protection
+3. Image upload RCE via CVE-2019-16113
+4. Lateral movement from `www-data` → `hugo`
+5. Privilege escalation via `sudo` bypass (CVE-2019-14287)
+
+<Callout type="tip" title="Box Info">
+- **OS**: Linux
+- **Difficulty**: Easy
+- **IP**: 10.10.10.191
+</Callout>
+
+## Enumeration
+
+### Nmap
+
+```bash
+nmap -sC -sV -oA nmap/blunder 10.10.10.191
+```
+
+```
+PORT   STATE SERVICE VERSION
+80/tcp open  http    Apache httpd 2.4.41 ((Ubuntu))
+```
+
+Only port 80 open. Let's explore the web application.
+
+### Directory busting
+
+```bash
+gobuster dir -u http://10.10.10.191 \
+  -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt \
+  -x php,txt,html
+```
+
+<Callout type="note">
+Key findings:
+- `/admin` → Bludit CMS login panel
+- `/todo.txt` → leak of username `fergus`
+</Callout>
+
+## Exploitation
+
+See the subpages for detailed exploitation steps.

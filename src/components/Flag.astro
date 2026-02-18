@@ -1,0 +1,95 @@
+---
+// Flag.astro
+// Usage in MDX:
+//   <Flag value="CTF{f1ag_captur3d}" />
+//   <Flag value="picoCTF{s0m3_fl4g}" label="flag" />
+//
+// Using a `value` prop (not a slot) avoids MDX treating {} as JSX expressions.
+
+interface Props {
+  value: string;
+  label?: string;
+}
+
+const { value, label = 'flag' } = Astro.props;
+---
+
+<span class="flag-wrap" tabindex="0" aria-label="Blurred flag — hover or focus to reveal">
+  <span class="flag-label">
+    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+      <line x1="4" y1="22" x2="4" y2="15"/>
+    </svg>
+    {label}
+  </span>
+  <span class="flag-text">{value}</span>
+  <span class="flag-hint" aria-hidden="true">hover to reveal</span>
+</span>
+
+<style>
+  .flag-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    background: var(--bg-elevated);
+    border: 1px solid var(--warning-color);
+    border-radius: 4px;
+    padding: 0.15em 0.6em 0.15em 0.45em;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    position: relative;
+    outline: none;
+    user-select: none;
+  }
+
+  .flag-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    color: var(--warning-color);
+    font-size: 0.75em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+
+  .flag-text {
+    color: var(--text-primary);
+    filter: blur(6px);
+    transition: filter 0.25s ease;
+    display: inline-block;
+  }
+
+  .flag-hint {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7em;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 0.2s ease;
+  }
+
+  .flag-wrap:hover .flag-text,
+  .flag-wrap:focus .flag-text {
+    filter: blur(0);
+    user-select: text;
+  }
+
+  .flag-wrap:hover .flag-hint,
+  .flag-wrap:focus .flag-hint {
+    opacity: 0;
+  }
+
+  .flag-wrap:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 12px rgba(0, 212, 170, 0.15);
+  }
+</style>

@@ -1,0 +1,240 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Badge from '../components/Badge.astro';
+import { List, Home, FileText, ChevronLeft, ChevronDown, ChevronUp } from '@lucide/astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  date: Date;
+  tags?: string[];
+  image?: string;
+  parentSlug: string;
+  currentSlug: string;
+  subposts: Array<{ slug: string; title: string; href: string }>;
+}
+
+const { title, description, date, tags = [], image, parentSlug, currentSlug, subposts } = Astro.props;
+
+function formatDate(d: Date) {
+  return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+}
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="post-page-layout">
+
+    <!-- Left sidebar: TOC (desktop) -->
+    <aside class="post-left-sidebar">
+      <div class="sidebar-panel">
+        <div class="sidebar-section-title">
+          <List size={13} stroke-width={2} aria-hidden="true" />
+          ON THIS PAGE
+        </div>
+        <nav id="toc">
+          <ul class="toc-list" id="toc-list"></ul>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="post-content">
+
+      <!-- Mobile sidebars (sections + TOC), only rendered if there are subposts or headings -->
+      <div class="post-mobile-sidebars">
+
+        {subposts.length > 0 && (
+          <div class="mobile-sidebar-panel">
+            <button
+              class="mobile-sidebar-toggle"
+              id="mobile-sections-toggle"
+              aria-expanded="false"
+              aria-controls="mobile-sections-body"
+            >
+              <span class="mobile-sidebar-toggle-label">
+                <FileText size={13} stroke-width={2} aria-hidden="true" />
+                SECTIONS
+              </span>
+              <span id="sections-chevron-down" style="display:flex; color:var(--text-muted);">
+                <ChevronDown size={16} stroke-width={2} aria-hidden="true" />
+              </span>
+              <span id="sections-chevron-up" style="display:none; color:var(--text-muted);">
+                <ChevronUp size={16} stroke-width={2} aria-hidden="true" />
+              </span>
+            </button>
+            <ul class="subpost-list mobile-sidebar-body" id="mobile-sections-body">
+              {subposts.map(sp => (
+                <li class:list={['subpost-item', sp.slug === 'index' && 'is-index']}>
+                  <a href={sp.href} aria-current={sp.href === Astro.url.pathname ? 'page' : undefined}>
+                    {sp.slug === 'index'
+                      ? <Home size={12} stroke-width={2} aria-hidden="true" />
+                      : <FileText size={12} stroke-width={2} aria-hidden="true" />
+                    }
+                    {sp.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <div class="mobile-sidebar-panel" id="mobile-toc-panel" style="display:none;">
+          <button
+            class="mobile-sidebar-toggle"
+            id="mobile-toc-toggle"
+            aria-expanded="false"
+            aria-controls="mobile-toc-body"
+          >
+            <span class="mobile-sidebar-toggle-label">
+              <List size={13} stroke-width={2} aria-hidden="true" />
+              ON THIS PAGE
+            </span>
+            <span id="toc-chevron-down" style="display:flex; color:var(--text-muted);">
+              <ChevronDown size={16} stroke-width={2} aria-hidden="true" />
+            </span>
+            <span id="toc-chevron-up" style="display:none; color:var(--text-muted);">
+              <ChevronUp size={16} stroke-width={2} aria-hidden="true" />
+            </span>
+          </button>
+          <nav class="mobile-sidebar-body" id="mobile-toc-body">
+            <ul class="toc-list" id="mobile-toc-list"></ul>
+          </nav>
+        </div>
+
+      </div>
+
+      <header class="post-header">
+        {image && (
+          <div class="post-header-image-wrap">
+            <img src={image} alt={title} class="post-header-image" />
+          </div>
+        )}
+        <div class="post-header-meta">
+          <a href="/blog" style="color: var(--text-muted); display:flex; align-items:center; gap:0.3rem;">
+            <ChevronLeft size={13} stroke-width={2} aria-hidden="true" />
+            blog
+          </a>
+          <span>/</span>
+          <span>{parentSlug}</span>
+          <span style="margin-left:auto;">{formatDate(date)}</span>
+        </div>
+        <h1 class="post-header-title">{title}</h1>
+        {description && <p class="post-header-desc">{description}</p>}
+        {tags.length > 0 && (
+          <div class="post-header-tags">
+            {tags.map(tag => <Badge tag={tag} />)}
+          </div>
+        )}
+      </header>
+
+      <div class="prose">
+        <slot />
+      </div>
+    </main>
+
+    <!-- Right sidebar: subpost navigation (desktop) -->
+    {subposts.length > 0 && (
+      <aside class="post-right-sidebar">
+        <div class="sidebar-panel">
+          <div class="sidebar-section-title">
+            <FileText size={13} stroke-width={2} aria-hidden="true" />
+            SECTIONS
+          </div>
+          <ul class="subpost-list">
+            {subposts.map(sp => (
+              <li class:list={['subpost-item', sp.slug === 'index' && 'is-index']}>
+                <a href={sp.href} aria-current={sp.href === Astro.url.pathname ? 'page' : undefined}>
+                  {sp.slug === 'index'
+                    ? <Home size={12} stroke-width={2} aria-hidden="true" />
+                    : <FileText size={12} stroke-width={2} aria-hidden="true" />
+                  }
+                  {sp.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </aside>
+    )}
+  </div>
+</BaseLayout>
+
+<script>
+  function buildTOC() {
+    const prose = document.querySelector('.prose');
+    if (!prose) return;
+    const headings = prose.querySelectorAll('h2, h3, h4');
+
+    // Assign IDs
+    headings.forEach(h => {
+      if (!h.id) {
+        h.id = h.textContent?.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || '';
+      }
+    });
+
+    if (headings.length === 0) return;
+
+    // Desktop TOC
+    const tocList = document.getElementById('toc-list');
+    if (tocList) {
+      tocList.innerHTML = Array.from(headings).map(h => {
+        const depth = parseInt(h.tagName[1]);
+        return `<li class="toc-item depth-${depth}"><a href="#${h.id}">${h.textContent}</a></li>`;
+      }).join('');
+    }
+
+    // Mobile TOC — show panel and populate list
+    const mobileTocPanel = document.getElementById('mobile-toc-panel');
+    const mobileTocList  = document.getElementById('mobile-toc-list');
+    if (mobileTocPanel) mobileTocPanel.style.display = '';
+    if (mobileTocList) {
+      mobileTocList.innerHTML = Array.from(headings).map(h => {
+        const depth = parseInt(h.tagName[1]);
+        return `<li class="toc-item depth-${depth}"><a href="#${h.id}">${h.textContent}</a></li>`;
+      }).join('');
+    }
+
+    // Active heading observer (desktop)
+    const items    = tocList?.querySelectorAll('.toc-item') ?? [];
+    const itemMap  = new Map<string, Element>();
+    items.forEach(item => {
+      const id = item.querySelector('a')?.getAttribute('href')?.slice(1);
+      if (id) itemMap.set(id, item);
+    });
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        itemMap.get(entry.target.id)?.classList.toggle('active', entry.isIntersecting);
+      });
+    }, { rootMargin: '-60px 0px -80% 0px', threshold: 0 });
+
+    headings.forEach(h => observer.observe(h));
+  }
+
+  // ── Collapsible toggles (mobile only) ────────────────────────────────────
+  function setupToggle(
+    toggleId: string,
+    bodyId: string,
+    downId: string,
+    upId: string
+  ) {
+    const btn   = document.getElementById(toggleId);
+    const body  = document.getElementById(bodyId);
+    const down  = document.getElementById(downId);
+    const up    = document.getElementById(upId);
+    if (!btn || !body) return;
+
+    btn.addEventListener('click', () => {
+      const open = body.classList.toggle('open');
+      btn.setAttribute('aria-expanded', String(open));
+      if (down) down.style.display = open ? 'none' : 'flex';
+      if (up)   up.style.display   = open ? 'flex' : 'none';
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    buildTOC();
+    setupToggle('mobile-sections-toggle', 'mobile-sections-body', 'sections-chevron-down', 'sections-chevron-up');
+    setupToggle('mobile-toc-toggle',      'mobile-toc-body',      'toc-chevron-down',      'toc-chevron-up');
+  });
+</script>
