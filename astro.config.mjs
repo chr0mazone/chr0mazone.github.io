@@ -1,6 +1,8 @@
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import expressiveCode from 'astro-expressive-code';
+import react from '@astrojs/react';
+import tailwindcss from '@tailwindcss/vite';
 import { remarkMermaid } from './src/lib/remark-mermaid.mjs';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
@@ -9,6 +11,7 @@ import rehypeKatex from 'rehype-katex';
 export default defineConfig({
   site: 'https://chr0mazone.github.io',
   integrations: [
+    react(),
     expressiveCode({
       themes: ['ayu-dark'],
       styleOverrides: {
@@ -29,5 +32,13 @@ export default defineConfig({
     // remarkMermaid first so mermaid blocks are extracted before expressive-code
     remarkPlugins: [remarkMermaid, remarkMath],
     rehypePlugins: [rehypeKatex],
+  },
+  vite: {
+    plugins: [tailwindcss()],
+    resolve: {
+      alias: {
+        '@': '/src',
+      },
+    },
   },
 });

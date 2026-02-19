@@ -3,7 +3,7 @@ import {
   Pencil, Lightbulb, TriangleAlert, Flame, Info,
   CircleCheck, HelpCircle, Clipboard, Bug, List,
   Quote, ChevronUp
-} from '@lucide/astro';
+} from 'lucide-astro';
 
 interface Props {
   type?: 'note' | 'tip' | 'warning' | 'danger' | 'info' | 'success' | 'question' | 'abstract' | 'bug' | 'example' | 'quote';
@@ -13,36 +13,36 @@ interface Props {
 
 const { type = 'note', title, collapsed = false } = Astro.props;
 
-const variants: Record<string, { color: string; icon: any; label: string; bg: string }> = {
-  note:     { color: 'var(--note-color)',     icon: Pencil,        label: 'Note',     bg: 'var(--note-bg)' },
-  tip:      { color: 'var(--tip-color)',      icon: Lightbulb,     label: 'Tip',      bg: 'var(--tip-bg)' },
-  warning:  { color: 'var(--warning-color)',  icon: TriangleAlert, label: 'Warning',  bg: 'var(--warning-bg)' },
-  danger:   { color: 'var(--danger-color)',   icon: Flame,         label: 'Danger',   bg: 'var(--danger-bg)' },
-  info:     { color: 'var(--info-color)',     icon: Info,          label: 'Info',     bg: 'var(--info-bg)' },
-  success:  { color: 'var(--success-color)',  icon: CircleCheck,   label: 'Success',  bg: 'var(--success-bg)' },
+const variants = {
+  note:     { color: 'var(--note-color)',     icon: Pencil,        label: 'Note',     bg: 'var(--note-bg)'     },
+  tip:      { color: 'var(--tip-color)',      icon: Lightbulb,     label: 'Tip',      bg: 'var(--tip-bg)'      },
+  warning:  { color: 'var(--warning-color)',  icon: TriangleAlert, label: 'Warning',  bg: 'var(--warning-bg)'  },
+  danger:   { color: 'var(--danger-color)',   icon: Flame,         label: 'Danger',   bg: 'var(--danger-bg)'   },
+  info:     { color: 'var(--info-color)',     icon: Info,          label: 'Info',     bg: 'var(--info-bg)'     },
+  success:  { color: 'var(--success-color)',  icon: CircleCheck,   label: 'Success',  bg: 'var(--success-bg)'  },
   question: { color: 'var(--question-color)', icon: HelpCircle,    label: 'Question', bg: 'var(--question-bg)' },
   abstract: { color: 'var(--abstract-color)', icon: Clipboard,     label: 'Abstract', bg: 'var(--abstract-bg)' },
-  bug:      { color: 'var(--bug-color)',      icon: Bug,           label: 'Bug',      bg: 'var(--bug-bg)' },
-  example:  { color: 'var(--example-color)',  icon: List,          label: 'Example',  bg: 'var(--example-bg)' },
-  quote:    { color: 'var(--quote-color)',    icon: Quote,         label: 'Quote',    bg: 'var(--quote-bg)' },
-};
+  bug:      { color: 'var(--bug-color)',      icon: Bug,           label: 'Bug',      bg: 'var(--bug-bg)'      },
+  example:  { color: 'var(--example-color)',  icon: List,          label: 'Example',  bg: 'var(--example-bg)'  },
+  quote:    { color: 'var(--quote-color)',    icon: Quote,         label: 'Quote',    bg: 'var(--quote-bg)'    },
+} as const;
 
-const variant = variants[type] || variants.note;
-const displayTitle = title || variant.label;
-const IconComponent = variant.icon;
+const v = variants[type] ?? variants.note;
+const Icon = v.icon;
+const displayTitle = title ?? v.label;
 ---
 
 <div
   class:list={['callout', collapsed && 'collapsed']}
-  style={`color: ${variant.color}; --callout-bg: ${variant.bg}; --callout-body-bg: rgba(0,0,0,0.18);`}
+  style={`color:${v.color}; --callout-bg:${v.bg}; --callout-body-bg:rgba(0,0,0,0.18);`}
   data-callout
 >
   <div class="callout-header" data-callout-header>
     <div class="callout-title-wrap">
-      <IconComponent size={16} stroke-width={2} class="callout-icon" aria-hidden="true" />
+      <Icon size={16} strokeWidth={2} class="callout-icon" aria-hidden="true" />
       <span>{displayTitle}</span>
     </div>
-    <ChevronUp size={16} stroke-width={2} class="callout-toggle" aria-hidden="true" />
+    <ChevronUp size={16} strokeWidth={2} class="callout-toggle" aria-hidden="true" />
   </div>
   <div class="callout-body">
     <slot />
@@ -50,11 +50,12 @@ const IconComponent = variant.icon;
 </div>
 
 <script>
-  document.querySelectorAll('[data-callout]').forEach((callout) => {
-    const header = callout.querySelector('[data-callout-header]');
-    if (!header) return;
-    header.addEventListener('click', () => {
-      callout.classList.toggle('collapsed');
+  // Use event delegation — one listener on document handles all callouts
+  if (!(window as any).__calloutListenerAttached) {
+    (window as any).__calloutListenerAttached = true;
+    document.addEventListener('click', e => {
+      const header = (e.target as Element).closest('[data-callout-header]');
+      if (header) header.closest('[data-callout]')?.classList.toggle('collapsed');
     });
-  });
+  }
 </script>

@@ -29,7 +29,7 @@ const flag = "picoCTF{hidden_in_plain_sight_abc123}";
 Browser DevTools → Sources → Pretty Print is your friend for minified JS challenges.
 </Callout>
 
-Flag: <Flag value="picoCTF{h1dd3n_1n_pl41n_s1ght_abc123}" />
+{/* Flag: <Flag value="picoCTF{h1dd3n_1n_pl41n_s1ght_abc123}" /> */}
 
 ## Crypto: Custom Encryption [200]
 
@@ -37,9 +37,9 @@ A custom XOR-based encryption scheme. The key insight: the "IV" was reused acros
 
 The encryption is effectively:
 
-$$
-C_i = P_i \oplus K_{i \bmod |K|}
-$$
+```math
+C_i = P_i \oplus K_{i \mod |K|}
+```
 
 Where $C_i$ is the ciphertext byte, $P_i$ is the plaintext byte, and $K$ is the key. With a reused keystream, given two ciphertexts $C$ and $C'$ encrypted with the same key:
 
@@ -97,7 +97,7 @@ p.sendline(b"%p " * 20)
 print(p.recvline())
 ```
 
-Flag: <Flag value="picoCTF{f0rm4t_str1ng_g0_brr_d3adb33f}" label="pwn flag" />
+{/* Flag: <Flag value="picoCTF{f0rm4t_str1ng_g0_brr_d3adb33f}" label="pwn flag" /> */}
 
 ## Conclusion
 

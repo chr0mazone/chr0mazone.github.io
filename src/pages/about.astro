@@ -1,10 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ProjectCard from '../components/ProjectCard.astro';
-import {
-  Github, Twitter, Mail, Monitor, Shield
-} from '@lucide/astro';
 import Badge from '../components/Badge.astro';
+import { Github, Twitter, Mail, Monitor, Shield } from 'lucide-astro';
 import { projects, skills } from '../data/projects';
 ---
 
@@ -27,29 +25,18 @@ import { projects, skills } from '../data/projects';
           </p>
           <div class="about-links">
             <a href="https://github.com/yourusername" target="_blank" rel="noopener" class="about-link">
-              <Github size={15} stroke-width={2} aria-hidden="true" />
-              GitHub
+              <Github size={15} strokeWidth={2} aria-hidden="true" /> GitHub
             </a>
             <a href="https://twitter.com/yourusername" target="_blank" rel="noopener" class="about-link">
-              <Twitter size={15} stroke-width={2} aria-hidden="true" />
-              Twitter
+              <Twitter size={15} strokeWidth={2} aria-hidden="true" /> Twitter
             </a>
             <a href="mailto:you@example.com" class="about-link">
-              <Mail size={15} stroke-width={2} aria-hidden="true" />
-              Email
+              <Mail size={15} strokeWidth={2} aria-hidden="true" /> Email
             </a>
           </div>
         </div>
 
-        <!-- Avatar -->
         <div>
-          <!-- Replace with: <img src="/images/avatar.jpg" alt="Your Name" class="about-avatar" /> -->
-          <!-- <div class="about-avatar-placeholder">
-            <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.4" aria-hidden="true">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-              <circle cx="12" cy="7" r="4"/>
-            </svg>
-          </div> -->
           <img src="https://avatars.githubusercontent.com/u/210249546?v=4" alt="Your Name" class="about-avatar" />
         </div>
       </section>
@@ -57,33 +44,23 @@ import { projects, skills } from '../data/projects';
       <!-- Projects carousel -->
       <section class="projects-section">
         <h2>
-          <Monitor size={18} stroke-width={2} aria-hidden="true" />
+          <Monitor size={18} strokeWidth={2} aria-hidden="true" />
           Projects
         </h2>
         <div class="projects-carousel-wrap">
           <div class="projects-carousel">
-            {projects.map(project => (
-              <ProjectCard
-                title={project.title}
-                description={project.description}
-                href={project.href}
-                image={project.image}
-                tags={project.tags}
-                status={project.status}
-                date={project.date}
-              />
-            ))}
+            {projects.map(project => <ProjectCard {...project} />)}
           </div>
         </div>
       </section>
 
       <!-- Skills -->
-      <section style="margin-top: 3rem;">
-        <h2 style="font-size: 1.25rem; color: var(--text-primary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-          <Shield size={18} stroke-width={2} aria-hidden="true" />
+      <section class="skills-section">
+        <h2>
+          <Shield size={18} strokeWidth={2} aria-hidden="true" />
           Skills &amp; Interests
         </h2>
-        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+        <div class="skills-badges">
           {skills.map(({ tag }) => <Badge tag={tag} />)}
         </div>
       </section>

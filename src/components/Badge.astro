@@ -1,75 +1,109 @@
 ---
+/**
+ * Badge.astro
+ *
+ * Define your own tags here. Each entry takes:
+ *   keywords: string[]   — tag names that match this badge (lowercased)
+ *   label:    string     — display text
+ *   color:    string     — Tailwind classes: bg-* text-* border-*
+ *   icon:     any        — lucide-react icon component
+ *
+ * Unknown tags fall back to a grey default badge.
+ */
+
+import { Badge as BadgePrimitive } from '@/components/ui/badge';
 import {
   Cpu, Code, Globe, Zap, Flag, Shield, Bug, Crosshair,
   Search, Lock, Eye, Wifi, Terminal, Monitor, Server,
-  Tag, Hash, BookOpen, Network, Sword, Key
-} from '@lucide/astro';
+  BookOpen, Hash, Database, Binary, Layers, Wrench,
+  FileText, Network, Key, Skull, Target, Loader2,
+  FlaskConical, Swords, Trophy,
+} from 'lucide-react';
 
 interface Props {
   tag: string;
-  color?: string;
-  icon?: string;
-  clickable?: boolean;
-  active?: boolean;
-  href?: string;
   class?: string;
 }
 
-const { tag, color, icon, clickable, active, href, class: className } = Astro.props;
+const { tag, class: className } = Astro.props;
 
-const specialBadges: Record<string, { color: string; icon: string; label?: string }> = {
-  rust:              { color: 'orange',  icon: 'Cpu',       label: 'rust' },
-  python:            { color: 'blue',    icon: 'Code',      label: 'python' },
-  web:               { color: 'blue',    icon: 'Globe',     label: 'web' },
-  pwn:               { color: 'red',     icon: 'Zap',       label: 'pwn' },
-  ctf:               { color: 'purple',  icon: 'Flag',      label: 'ctf' },
-  htb:               { color: 'green',   icon: 'Shield',    label: 'htb' },
-  malware:           { color: 'red',     icon: 'Bug',       label: 'malware' },
-  'red-team':        { color: 'red',     icon: 'Crosshair', label: 'red team' },
-  pentest:           { color: 'yellow',  icon: 'Search',    label: 'pentest' },
-  crypto:            { color: 'purple',  icon: 'Lock',      label: 'crypto' },
-  osint:             { color: 'accent',  icon: 'Eye',       label: 'osint' },
-  network:           { color: 'blue',    icon: 'Wifi',      label: 'network' },
-  linux:             { color: 'green',   icon: 'Terminal',  label: 'linux' },
-  windows:           { color: 'blue',    icon: 'Monitor',   label: 'windows' },
-  'active-directory':{ color: 'yellow',  icon: 'Server',    label: 'AD' },
-  recon:             { color: 'accent',  icon: 'Search',    label: 'recon' },
-  passive:           { color: 'blue',    icon: 'Eye',       label: 'passive' },
-  privesc:           { color: 'red',     icon: 'Zap',       label: 'privesc' },
-  bludit:            { color: 'orange',  icon: 'BookOpen',  label: 'bludit' },
-  cve:               { color: 'red',     icon: 'Bug',       label: 'cve' },
-  picoctf:           { color: 'purple',  icon: 'Flag',      label: 'picoctf' },
-};
+// ======================== Define your badges here ========================
+// color uses standard Tailwind v3-style classes (Tailwind v4 supports them)
 
-const special = specialBadges[tag.toLowerCase()];
-const resolvedColor = color || special?.color || '';
-const resolvedIcon  = icon  || special?.icon;
-const resolvedLabel = special?.label || tag;
+const definitions = [
+  // =============================== Languages ===============================
+  { keywords: ['rust'],        label: 'Rust',       color: 'bg-orange-950/40 text-orange-300 border-orange-700',   icon: Cpu       },
+  { keywords: ['python'],      label: 'Python',     color: 'bg-blue-950/40   text-blue-300   border-blue-700',     icon: Code      },
+  { keywords: ['javascript', 'js'], label: 'JS',    color: 'bg-yellow-950/40 text-yellow-300 border-yellow-700',  icon: Code      },
 
-// Map icon name string → component
-const iconMap: Record<string, any> = {
-  Cpu, Code, Globe, Zap, Flag, Shield, Bug, Crosshair,
-  Search, Lock, Eye, Wifi, Terminal, Monitor, Server,
-  Tag, Hash, BookOpen, Network, Sword, Key,
-};
+  // =============================== CTFs ===============================
+  { 
+    keywords: ['ctf'], label: 'CTF', color: 'bg-green-950/40  text-green-300  border-green-700', icon: Flag     
+  },
+  { 
+    keywords: ['pwn'], label: 'Pwn', color: 'bg-red-950/40    text-red-300    border-red-700', icon: Zap       
+  },
+  { 
+    keywords: ['bof'], label: 'BoF', color: 'bg-orange-950/40 text-orange-300 border-orange-700', icon: Zap       
+  },
+  { 
+    keywords: ['rev', 're'], label: 'RE', color: 'bg-purple-950/40 text-purple-300 border-purple-700', icon: Search    
+  },
+  { 
+    keywords: ['osint'], label: 'OSINT', color: 'bg-cyan-950/40    text-cyan-300    border-cyan-700', icon: Eye       
+  },
+  { 
+    keywords: ['network'], label: 'Network', color: 'bg-blue-950/40    text-blue-300    border-blue-700', icon: Wifi      
+  },
+  { 
+    keywords: ['crypto'], label: 'Crypto', color: 'bg-purple-950/40  text-purple-300  border-purple-700', icon: Lock      
+  },
+  { 
+    keywords: ['forensics'], label: 'Forensics', color: 'bg-yellow-950/40  text-yellow-300  border-yellow-700', icon: Search    
+  },
+  { 
+    keywords: ['malware'], label: 'Malware', color: 'bg-red-950/40     text-red-300     border-red-700', icon: Bug       
+  },
+  { 
+    keywords: ['steganography', 'stego'], label: 'Stego', color: 'bg-indigo-950/40 text-indigo-300 border-indigo-700', icon: Eye      
+  },
+  { 
+    keywords: ['web'], label: 'Web', color: 'bg-cyan-950/40   text-cyan-300   border-cyan-700', icon: Globe     
+  },
 
-const IconComponent = resolvedIcon ? iconMap[resolvedIcon] : null;
-const El = href ? 'a' : 'span';
+  // ============================ Security disciplines ============================
+  { keywords: ['pentest'],       label: 'Pentest',      color: 'bg-emerald-950/40 text-emerald-300 border-emerald-700', icon: Crosshair },
+  { keywords: ['red-team'],      label: 'Red Team',     color: 'bg-red-950/40     text-red-300     border-red-700',     icon: Target    },
+
+  // =============================== OS / Platforms ===============================
+  { keywords: ['linux'],            label: 'Linux',    color: 'bg-orange-950/40 text-orange-300 border-orange-700', icon: Terminal },
+  { keywords: ['windows'],          label: 'Windows',  color: 'bg-blue-950/40   text-blue-300   border-blue-700',   icon: Monitor  },
+  { keywords: ['active-directory', 'ad'], label: 'AD', color: 'bg-blue-950/40   text-blue-300   border-blue-700',   icon: Server   },
+  { keywords: ['htb', 'hackthebox'],        label: 'HTB',        color: 'bg-green-950/40  text-green-300  border-green-700',   icon: Server   },
+  { keywords: ['thm', 'tryhackme'],         label: 'THM',        color: 'bg-red-950/40    text-red-300    border-red-700',     icon: Server   },
+
+  // =============================== Status ===============================
+  { keywords: ['in progress', 'in-progress'], label: 'In Progress', color: 'bg-amber-950/40  text-amber-300  border-amber-600',  icon: Loader2      },
+  { keywords: ['completed'],                  label: 'Completed',   color: 'bg-green-950/40  text-green-300  border-green-700',  icon: Trophy       },
+  { keywords: ['archived'],                   label: 'Archived',    color: 'bg-neutral-900   text-neutral-400 border-neutral-700', icon: FileText   },
+
+  // =============================== Misc ===============================
+  { keywords: ['misc'],              label: 'Misc',       color: 'bg-neutral-900   text-neutral-400 border-neutral-700', icon: Layers   },
+  { keywords: ['tool'],              label: 'Tool',       color: 'bg-neutral-900   text-neutral-400 border-neutral-700', icon: Wrench   },
+  { keywords: ['writeup', 'write-up'], label: 'Write-up', color: 'bg-green-950/40  text-green-300  border-green-700',   icon: BookOpen },
+  { keywords: ['lab'],               label: 'Lab',        color: 'bg-purple-950/40 text-purple-300 border-purple-700',  icon: FlaskConical },
+  { keywords: ['challenge'],         label: 'Challenge',  color: 'bg-yellow-950/40 text-yellow-300 border-yellow-700',  icon: Swords  },
+];
+
+
+const key = tag.toLowerCase().trim();
+const match = definitions.find(d => d.keywords.includes(key));
+const color = match?.color;
+const Icon  = match?.icon ?? Hash;
+const label = match?.label ?? tag;
 ---
 
-<El
-  href={href}
-  class:list={[
-    'badge',
-    resolvedColor ? `badge-${resolvedColor}` : '',
-    clickable && 'clickable',
-    active && 'active',
-    className,
-  ]}
->
-  {IconComponent
-    ? <IconComponent size={11} stroke-width={2} aria-hidden="true" />
-    : <Hash size={10} stroke-width={2} aria-hidden="true" style="opacity:0.6" />
-  }
-  {resolvedLabel}
-</El>
+<BadgePrimitive color={color} className={className} client:load>
+  <Icon size={12} />
+  {label}
+</BadgePrimitive>

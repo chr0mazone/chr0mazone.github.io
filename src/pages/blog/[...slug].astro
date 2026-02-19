@@ -17,6 +17,11 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content } = await post.render();
 
+// Normalize image: local images come back as { src, width, height, ... }, external URLs are plain strings
+const imageStr = post.data.image
+  ? (typeof post.data.image === 'string' ? post.data.image : post.data.image.src)
+  : undefined;
+
 // Determine the parent folder slug
 const slugParts = post.slug.split('/');
 const parentSlug = slugParts[0];
@@ -53,7 +58,7 @@ const subposts = siblings
   description={post.data.description}
   date={post.data.date}
   tags={post.data.tags}
-  image={post.data.image}
+  image={imageStr}
   parentSlug={parentSlug}
   currentSlug={post.slug}
   subposts={subposts.length > 1 ? subposts : []}

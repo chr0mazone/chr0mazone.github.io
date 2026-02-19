@@ -1,5 +1,6 @@
 ---
-import { Calendar, RotateCw, CircleCheck, Archive, Monitor } from '@lucide/astro';
+import Badge from './Badge.astro';
+import { Calendar, Monitor } from 'lucide-astro';
 
 interface Props {
   title: string;
@@ -12,14 +13,6 @@ interface Props {
 }
 
 const { title, description, href, image, tags = [], status, date } = Astro.props;
-
-const statusConfig = {
-  completed:    { color: 'var(--tip-color)',     label: 'completed',   Icon: CircleCheck },
-  'in-progress':{ color: 'var(--warning-color)', label: 'in progress', Icon: RotateCw },
-  archived:     { color: 'var(--text-muted)',     label: 'archived',    Icon: Archive },
-};
-
-const st = statusConfig[status || 'completed'];
 ---
 
 <a href={href} target="_blank" rel="noopener noreferrer" class="project-card">
@@ -27,7 +20,7 @@ const st = statusConfig[status || 'completed'];
     <img src={image} alt={title} class="project-card-image" loading="lazy" />
   ) : (
     <div class="project-card-image-placeholder">
-      <Monitor size={32} stroke-width={1} aria-hidden="true" style="opacity:0.3" />
+      <Monitor size={32} strokeWidth={1} aria-hidden="true" style="opacity:0.3" />
     </div>
   )}
   <div class="project-card-body">
@@ -35,20 +28,13 @@ const st = statusConfig[status || 'completed'];
     <div class="project-card-desc">{description}</div>
     {date && (
       <div class="project-card-meta">
-        <Calendar size={12} stroke-width={2} aria-hidden="true" />
+        <Calendar size={12} strokeWidth={2} aria-hidden="true" />
         {date}
       </div>
     )}
     <div class="project-card-tags">
-      {status && (
-        <span class="badge" style={`color: ${st.color}; border-color: ${st.color}40; background: ${st.color}12;`}>
-          <st.Icon size={10} stroke-width={2.5} aria-hidden="true" />
-          {st.label}
-        </span>
-      )}
-      {tags.map(tag => (
-        <span class="badge">{tag}</span>
-      ))}
+      {status && <Badge tag={status} />}
+      {tags.map(tag => <Badge tag={tag} />)}
     </div>
   </div>
 </a>

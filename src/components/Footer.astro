@@ -1,5 +1,5 @@
 ---
-import { Github, Twitter, Linkedin, Youtube, MessageCircle, Mail, Rss } from '@lucide/astro';
+import { Github, Twitter, Linkedin, Youtube, MessageCircle, Mail, Rss } from 'lucide-astro';
 import { socials } from '../data/projects';
 
 const year = new Date().getFullYear();
@@ -10,7 +10,7 @@ const iconMap = { github: Github, twitter: Twitter, linkedin: Linkedin, youtube:
 <footer class="footer">
   <div class="footer-inner">
     <span class="footer-copy">
-      &copy; {year} <span class="footer-brand">Arjit Praveen</span>
+      &copy; {year} <span class="footer-brand">hackerlab</span>
     </span>
     <nav class="footer-socials" aria-label="Social links">
       {socials.map(({ label, href, icon }) => {

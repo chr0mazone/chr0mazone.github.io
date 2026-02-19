@@ -1,7 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import Badge from '../../components/Badge.astro';
-import { Search, Tag, FileText, ChevronDown, ChevronUp } from '@lucide/astro';
+import { PostList } from '../../components/ui/post-list';
 import { getCollection } from 'astro:content';
 
 const allPosts = (await getCollection('blog', ({ data }) => !data.draft))
@@ -28,12 +27,9 @@ topLevelPosts.forEach(post => {
   });
 });
 
-const sortedTags = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]);
-const totalTags = Object.keys(tagCounts).length;
-
-function formatDate(d: Date) {
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-}
+const allTags = Object.entries(tagCounts)
+  .sort((a, b) => b[1] - a[1])
+  .map(([tag, count]) => ({ tag, count }));
 
 const postsData = topLevelPosts.map(post => {
   const parentSlug = post.slug.includes('/') ? post.slug.split('/')[0] : post.slug;
@@ -41,9 +37,11 @@ const postsData = topLevelPosts.map(post => {
     slug: parentSlug,
     title: post.data.title,
     description: post.data.description,
-    date: formatDate(post.data.date),
+    date: post.data.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
     tags: post.data.tags,
-    image: post.data.image || null,
+    image: post.data.image
+      ? (typeof post.data.image === 'string' ? post.data.image : post.data.image.src)
+      : null,
     subposts: subpostCounts[parentSlug] || 0,
     href: `/blog/${parentSlug}`,
   };
@@ -52,305 +50,11 @@ const postsData = topLevelPosts.map(post => {
 
 <BaseLayout title="Blog" description="Security research, CTF writeups, and pentesting notes.">
   <div class="page-container">
-    <div class="blog-layout" id="blog-layout">
-
-      <!-- Left Sidebar -->
-      <aside class="blog-sidebar">
-        <!-- Mobile collapse toggle -->
-        <button
-          class="blog-sidebar-toggle"
-          id="sidebar-toggle"
-          aria-expanded="false"
-          aria-controls="sidebar-body"
-        >
-          <span class="blog-sidebar-toggle-label">
-            <FileText size={13} stroke-width={2} aria-hidden="true" />
-            Filters &amp; Tags
-          </span>
-          <span id="sidebar-chevron-down" style="color:var(--text-muted); display:flex;"><ChevronDown size={16} stroke-width={2} aria-hidden="true" /></span>
-          <span id="sidebar-chevron-up"   style="color:var(--text-muted); display:none;"><ChevronUp   size={16} stroke-width={2} aria-hidden="true" /></span>
-        </button>
-
-        <div class="blog-sidebar-body" id="sidebar-body">
-
-          <!-- Search -->
-          <div>
-            <div class="sidebar-section-title">
-              <Search size={13} stroke-width={2} aria-hidden="true" />
-              SEARCH
-            </div>
-            <div class="search-input-wrap">
-              <Search size={14} class="search-icon" aria-hidden="true" />
-              <input
-                type="text"
-                id="search-input"
-                class="search-input"
-                placeholder="Search posts..."
-                autocomplete="off"
-              />
-            </div>
-          </div>
-
-          <!-- Tags — server-rendered with Badge component -->
-          <div>
-            <div class="sidebar-section-title">
-              <Tag size={13} stroke-width={2} aria-hidden="true" />
-              TAGS
-            </div>
-            <div class="tag-list">
-              <div class="tag-item active" data-tag="all" role="button" tabindex="0">
-                <span class="tag-name">all</span>
-                <span class="tag-count">{topLevelPosts.length}</span>
-              </div>
-              {sortedTags.map(([tag, count]) => (
-                <div class="tag-item" data-tag={tag} role="button" tabindex="0">
-                  <Badge tag={tag} />
-                  <span class="tag-count">{count}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <!-- Stats -->
-          <div class="sidebar-stats">
-            <div class="stat-item">
-              <span class="stat-value">{topLevelPosts.length}</span>
-              <div class="stat-label">POSTS</div>
-            </div>
-            <div class="stat-item">
-              <span class="stat-value">{totalTags}</span>
-              <div class="stat-label">TAGS</div>
-            </div>
-          </div>
-
-        </div><!-- end sidebar-body -->
-      </aside>
-
-      <!-- Main content -->
-      <main>
-        <div id="post-list" class="post-list"></div>
-        <div id="no-results" class="no-results" style="display:none;">
-          <Search size={40} stroke-width={1.5} class="icon" aria-hidden="true" style="opacity:0.4; display:block; margin: 0 auto 1rem;" />
-          <p>No posts found</p>
-        </div>
-        <div id="pagination" class="pagination"></div>
-      </main>
-
-    </div>
+    <PostList
+      posts={postsData}
+      allTags={allTags}
+      totalPosts={topLevelPosts.length}
+      client:load
+    />
   </div>
 </BaseLayout>
-
-<script define:vars={{ postsData }}>
-const POSTS_PER_PAGE = 5;
-let currentPage = 1;
-let filteredPosts = [...postsData];
-let currentTag = 'all';
-let currentSearch = '';
-
-// ── Special badge definitions (mirror of Badge.astro) ──────────────────────
-const specialBadges = {
-  rust:              { color: 'orange',  icon: 'cpu',        label: 'rust' },
-  python:            { color: 'blue',    icon: 'code',       label: 'python' },
-  web:               { color: 'blue',    icon: 'globe',      label: 'web' },
-  pwn:               { color: 'red',     icon: 'zap',        label: 'pwn' },
-  ctf:               { color: 'purple',  icon: 'flag',       label: 'ctf' },
-  htb:               { color: 'green',   icon: 'shield',     label: 'htb' },
-  malware:           { color: 'red',     icon: 'bug',        label: 'malware' },
-  'red-team':        { color: 'red',     icon: 'crosshair',  label: 'red team' },
-  pentest:           { color: 'yellow',  icon: 'search',     label: 'pentest' },
-  crypto:            { color: 'purple',  icon: 'lock',       label: 'crypto' },
-  osint:             { color: 'accent',  icon: 'eye',        label: 'osint' },
-  network:           { color: 'blue',    icon: 'wifi',       label: 'network' },
-  linux:             { color: 'green',   icon: 'terminal',   label: 'linux' },
-  windows:           { color: 'blue',    icon: 'monitor',    label: 'windows' },
-  'active-directory':{ color: 'yellow',  icon: 'server',     label: 'AD' },
-  recon:             { color: 'accent',  icon: 'search',     label: 'recon' },
-  passive:           { color: 'blue',    icon: 'eye',        label: 'passive' },
-  privesc:           { color: 'red',     icon: 'zap',        label: 'privesc' },
-  bludit:            { color: 'orange',  icon: 'book-open',  label: 'bludit' },
-  cve:               { color: 'red',     icon: 'bug',        label: 'cve' },
-  picoctf:           { color: 'purple',  icon: 'flag',       label: 'picoctf' },
-};
-
-// CSS variable map for badge color names
-const colorVars = {
-  accent:  { fg: 'var(--accent)',        border: 'var(--accent-border)',       bg: 'var(--accent-muted)' },
-  blue:    { fg: 'var(--note-color)',    border: 'rgba(96,165,250,0.3)',       bg: 'var(--note-bg)' },
-  green:   { fg: 'var(--tip-color)',     border: 'rgba(52,211,153,0.3)',       bg: 'var(--tip-bg)' },
-  yellow:  { fg: 'var(--warning-color)', border: 'rgba(251,191,36,0.3)',       bg: 'var(--warning-bg)' },
-  red:     { fg: 'var(--danger-color)',  border: 'rgba(248,113,113,0.3)',      bg: 'var(--danger-bg)' },
-  purple:  { fg: 'var(--info-color)',    border: 'rgba(167,139,250,0.3)',      bg: 'var(--info-bg)' },
-  orange:  { fg: 'var(--bug-color)',     border: 'rgba(251,146,60,0.3)',       bg: 'var(--bug-bg)' },
-};
-
-// Lucide icon SVG paths (subset used by specialBadges)
-const iconSvgs = {
-  cpu:        '<rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/>',
-  code:       '<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>',
-  globe:      '<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
-  zap:        '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
-  flag:       '<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>',
-  shield:     '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
-  bug:        '<rect x="8" y="6" width="8" height="14" rx="4"/><path d="M19 7l-3 2M5 7l3 2M19 11h-3M5 11h3M19 15l-3-2M5 15l3-2M9 3l1 2M15 3l-1 2"/>',
-  crosshair:  '<circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/>',
-  search:     '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
-  lock:       '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
-  eye:        '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
-  wifi:       '<path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>',
-  terminal:   '<polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>',
-  monitor:    '<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>',
-  server:     '<rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/>',
-  'book-open':'<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
-  hash:       '<line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/>',
-};
-
-function makeSvg(name, size = 11) {
-  const path = iconSvgs[name] || iconSvgs.hash;
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
-}
-
-function makeBadge(tag) {
-  const special = specialBadges[tag.toLowerCase()];
-  const label   = special?.label ?? tag;
-  const icon    = special?.icon  ?? 'hash';
-  const colors  = special ? (colorVars[special.color] ?? {}) : {};
-
-  const style = colors.fg
-    ? `style="color:${colors.fg}; border-color:${colors.border}; background:${colors.bg};"`
-    : '';
-
-  return `<span class="badge" ${style}>${makeSvg(icon)} ${label}</span>`;
-}
-
-// ── Inline SVG strings for structural icons ────────────────────────────────
-const FILE_ICON = makeSvg('book-open', 12);
-const PREV_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>`;
-const NEXT_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`;
-
-function formatPostCard(post) {
-  const hasImage = post.image;
-  const subpostsHtml = post.subposts > 0
-    ? `<span class="subposts-badge">${FILE_ICON} ${post.subposts} section${post.subposts > 1 ? 's' : ''}</span>`
-    : '';
-
-  const tagsHtml = post.tags.map(tag => makeBadge(tag)).join('');
-
-  const imageHtml = hasImage
-    ? `<div class="post-card-image-wrap"><img src="${post.image}" alt="${post.title}" class="post-card-image" loading="lazy" /></div>`
-    : '';
-
-  return `
-    <article class="post-card${hasImage ? ' post-card-has-image' : ''}">
-      <div class="post-card-inner">
-        <div class="post-card-meta">
-          <span>${post.date}</span>
-          ${subpostsHtml}
-        </div>
-        <a href="${post.href}" class="post-card-title">${post.title}</a>
-        <p class="post-card-desc">${post.description}</p>
-        <div class="post-card-tags">${tagsHtml}</div>
-      </div>
-      ${imageHtml}
-    </article>
-  `;
-}
-
-function renderPosts() {
-  const start = (currentPage - 1) * POSTS_PER_PAGE;
-  const pagePosts = filteredPosts.slice(start, start + POSTS_PER_PAGE);
-  const listEl = document.getElementById('post-list');
-  const noResults = document.getElementById('no-results');
-  const pagination = document.getElementById('pagination');
-
-  if (filteredPosts.length === 0) {
-    listEl.innerHTML = '';
-    noResults.style.display = 'block';
-    pagination.innerHTML = '';
-    return;
-  }
-  noResults.style.display = 'none';
-  listEl.innerHTML = pagePosts.map(formatPostCard).join('');
-
-  const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
-  if (totalPages <= 1) { pagination.innerHTML = ''; return; }
-
-  let html = `<button class="pagination-btn ${currentPage === 1 ? 'disabled' : ''}" data-page="${currentPage - 1}" aria-label="Previous">${PREV_ICON}</button>`;
-  for (let i = 1; i <= totalPages; i++) {
-    html += `<button class="pagination-btn ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
-  }
-  html += `<button class="pagination-btn ${currentPage === totalPages ? 'disabled' : ''}" data-page="${currentPage + 1}" aria-label="Next">${NEXT_ICON}</button>`;
-  pagination.innerHTML = html;
-
-  pagination.querySelectorAll('.pagination-btn:not(.disabled)').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const page = parseInt(btn.dataset.page);
-      if (!isNaN(page) && page !== currentPage) {
-        currentPage = page;
-        renderPosts();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-    });
-  });
-}
-
-function applyFilters() {
-  currentPage = 1;
-  filteredPosts = postsData.filter(post => {
-    const matchesTag = currentTag === 'all' || post.tags.includes(currentTag);
-    const q = currentSearch.toLowerCase();
-    const matchesSearch = !q ||
-      post.title.toLowerCase().includes(q) ||
-      post.description.toLowerCase().includes(q) ||
-      post.tags.some(t => t.toLowerCase().includes(q));
-    return matchesTag && matchesSearch;
-  });
-  renderPosts();
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  renderPosts();
-
-  document.querySelectorAll('.tag-item').forEach(item => {
-    item.addEventListener('click', () => {
-      document.querySelectorAll('.tag-item').forEach(el => el.classList.remove('active'));
-      item.classList.add('active');
-      currentTag = item.dataset.tag;
-      applyFilters();
-    });
-    item.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') item.click(); });
-  });
-
-  let debounce;
-  document.getElementById('search-input')?.addEventListener('input', (e) => {
-    clearTimeout(debounce);
-    debounce = setTimeout(() => {
-      currentSearch = e.target.value;
-      applyFilters();
-    }, 200);
-  });
-});
-</script>
-
-<script>
-  const toggle      = document.getElementById('sidebar-toggle');
-  const sidebarBody = document.getElementById('sidebar-body');
-  const chevronDown = document.getElementById('sidebar-chevron-down');
-  const chevronUp   = document.getElementById('sidebar-chevron-up');
-
-  function isMobile() { return window.innerWidth <= 768; }
-
-  function syncState() {
-    if (!isMobile()) sidebarBody?.classList.add('open');
-  }
-
-  syncState();
-  window.addEventListener('resize', syncState);
-
-  toggle?.addEventListener('click', () => {
-    if (!isMobile()) return;
-    const open = sidebarBody?.classList.toggle('open');
-    toggle.setAttribute('aria-expanded', String(open));
-    if (chevronDown) chevronDown.style.display = open ? 'none' : 'flex';
-    if (chevronUp)   chevronUp.style.display   = open ? 'flex' : 'none';
-  });
-</script>

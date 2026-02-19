@@ -1,8 +1,8 @@
 ---
-// BaseLayout.astro
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
 import '../styles/global.css';
+import '../styles/tailwind.css';
 
 interface Props {
   title?: string;
@@ -10,7 +10,7 @@ interface Props {
 }
 
 const {
-  title = "Arjit's Portfolio",
+  title = "Arjit's Blog",
   description = 'Pentesting, red teaming, CTF writeups and security research.',
 } = Astro.props;
 ---
@@ -21,96 +21,36 @@ const {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content={description} />
-  <title>{title !== "Arjit's Portfolio" ? `${title} | Home` : 'hackerlab'}</title>
+  <title>{title !== "Arjit's Blog" ? `${title} | Arjit's Blog` : "Arjit's Blog"}</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <!-- JetBrains Mono from Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet" />
-  <!-- KaTeX CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous" />
+</head>
+<body>
+  <Navbar />
+  <slot />
+  <Footer />
 
-  <style>
-    /* ——— KaTeX dark theme overrides ——— */
-    .katex { font-size: 1.05em; color: var(--text-primary); }
-    .katex-display {
-      overflow-x: auto;
-      overflow-y: hidden;
-      padding: 1.25rem 1rem;
-      margin: 1.25rem 0;
-      background: var(--bg-surface);
-      border: 1px solid var(--color-border);
-      border-left: 3px solid var(--accent);
-    }
-    .katex-display > .katex { color: var(--text-primary); }
-    /* Inline math sits flush with text */
-    .katex-inline { display: inline; }
-  </style>
+  <button id="scroll-top" aria-label="Scroll to top" title="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M8 6L12 2L16 6"/><path d="M12 2V22"/><path d="M8 12L12 8L16 12"/>
+    </svg>
+  </button>
 
-  <style>
-    /* ——— Mermaid diagram styles ——— */
-    .mermaid-diagram {
-      margin: 1.5rem 0;
-      padding: 1.5rem 1rem;
-      background: var(--bg-surface);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius);
-      overflow-x: auto;
-      text-align: center;
-    }
-    .mermaid-diagram svg {
-      max-width: 100%;
-      height: auto;
-    }
-    /* Mermaid dark theme overrides */
-    .mermaid-diagram .label { color: var(--text-primary) !important; }
-    .mermaid-diagram .node rect,
-    .mermaid-diagram .node circle,
-    .mermaid-diagram .node ellipse,
-    .mermaid-diagram .node polygon {
-      fill: var(--bg-elevated) !important;
-      stroke: var(--accent) !important;
-    }
-    .mermaid-diagram .edgePath .path {
-      stroke: var(--accent-dim) !important;
-    }
-    .mermaid-diagram .arrowheadPath {
-      fill: var(--accent-dim) !important;
-    }
-    .mermaid-diagram .edgeLabel {
-      background-color: var(--bg-base) !important;
-      color: var(--text-secondary) !important;
-    }
-    /* Loading state */
-    .mermaid-diagram.mermaid-loading {
-      color: var(--text-muted);
-      font-family: var(--font-mono);
-      font-size: 0.8125rem;
-    }
-    .mermaid-diagram.mermaid-error {
-      border-color: var(--danger-color);
-      background: var(--danger-bg);
-      color: var(--danger-color);
-      font-family: var(--font-mono);
-      font-size: 0.8125rem;
-      text-align: left;
-      padding: 1rem;
-    }
-    .mermaid-diagram.mermaid-error pre {
-      margin-top: 0.5rem;
-      font-size: 0.75rem;
-      color: var(--text-secondary);
-      white-space: pre-wrap;
-    }
-  </style>
+  <script>
+    const btn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => btn?.classList.toggle('visible', window.scrollY > 300), { passive: true });
+    btn?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  </script>
 
-  <!-- Mermaid.js — loaded only when diagrams are present on the page -->
+  <!-- Mermaid: loaded from CDN only when diagrams exist on the page -->
   <script type="module">
     document.addEventListener('DOMContentLoaded', async () => {
       const diagrams = document.querySelectorAll('.mermaid-diagram');
       if (diagrams.length === 0) return;
 
-      // Dynamically import mermaid from CDN
       const { default: mermaid } = await import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs');
 
       mermaid.initialize({
@@ -118,110 +58,49 @@ const {
         theme: 'dark',
         darkMode: true,
         themeVariables: {
-          // Match our color scheme
-          background:        '#0d1117',
-          mainBkg:           '#1a2332',
-          nodeBorder:        '#00d4aa',
-          lineColor:         '#00a885',
-          primaryColor:      '#1a2332',
-          primaryBorderColor:'#00d4aa',
-          primaryTextColor:  '#e2e8f0',
-          secondaryColor:    '#111827',
-          secondaryBorderColor:'#1e3a4a',
-          secondaryTextColor:'#94a3b8',
-          tertiaryColor:     '#1e2d3d',
-          tertiaryBorderColor:'#2a5060',
-          tertiaryTextColor: '#94a3b8',
-          edgeLabelBackground:'#111827',
-          clusterBkg:        '#111827',
-          clusterBorder:     '#1e3a4a',
-          titleColor:        '#e2e8f0',
-          fontFamily:        'JetBrains Mono, monospace',
-          fontSize:          '14px',
-          // Flowchart specific
-          fillType0:         '#1a2332',
-          fillType1:         '#1e2d3d',
+          background:           '#0d1117',
+          mainBkg:              '#1a2332',
+          nodeBorder:           '#00d4aa',
+          lineColor:            '#00a885',
+          primaryColor:         '#1a2332',
+          primaryBorderColor:   '#00d4aa',
+          primaryTextColor:     '#e2e8f0',
+          secondaryColor:       '#111827',
+          secondaryBorderColor: '#1e3a4a',
+          secondaryTextColor:   '#94a3b8',
+          tertiaryColor:        '#1e2d3d',
+          tertiaryBorderColor:  '#2a5060',
+          tertiaryTextColor:    '#94a3b8',
+          edgeLabelBackground:  '#111827',
+          clusterBkg:           '#111827',
+          clusterBorder:        '#1e3a4a',
+          titleColor:           '#e2e8f0',
+          fontFamily:           'JetBrains Mono, monospace',
+          fontSize:             '14px',
         },
-        flowchart:  { curve: 'basis', htmlLabels: true },
-        sequence:   { actorMargin: 50 },
-        gantt:      { axisFormat: '%Y-%m-%d' },
+        flowchart: { curve: 'basis', htmlLabels: true },
+        sequence:  { actorMargin: 50 },
+        gantt:     { axisFormat: '%Y-%m-%d' },
       });
 
-      // Render each diagram
       let id = 0;
       for (const el of diagrams) {
         const encoded = el.getAttribute('data-mermaid');
         if (!encoded) continue;
-
         const code = decodeURIComponent(encoded);
-        const diagramId = `mermaid-svg-${id++}`;
-
         el.classList.add('mermaid-loading');
-        el.textContent = 'Rendering diagram…';
-
+        el.textContent = 'Rendering diagram\u2026';
         try {
-          const { svg } = await mermaid.render(diagramId, code);
+          const { svg } = await mermaid.render(`mermaid-svg-${id++}`, code);
           el.innerHTML = svg;
           el.classList.remove('mermaid-loading');
         } catch (err) {
           el.classList.remove('mermaid-loading');
           el.classList.add('mermaid-error');
-          el.innerHTML = `<strong>⚠ Mermaid error</strong><pre>${err.message ?? err}</pre>`;
+          el.innerHTML = `<strong>\u26a0 Mermaid error</strong><pre>${err.message ?? err}</pre>`;
         }
       }
     });
-  </script>
-</head>
-<body>
-  <Navbar />
-  <slot />
-  <Footer />
-
-  <!-- Scroll to top button -->
-  <button id="scroll-top" aria-label="Scroll to top" title="Scroll to top">
-    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="M8 6L12 2L16 6"/><path d="M12 2V22"/><path d="M8 12L12 8L16 12"/>
-    </svg>
-  </button>
-
-  <style>
-    #scroll-top {
-      position: fixed;
-      bottom: calc(var(--footer-h) + 1rem);
-      right: 1.25rem;
-      z-index: 99;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--bg-elevated);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius);
-      color: var(--text-muted);
-      cursor: pointer;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s, border-color 0.2s, color 0.2s, background 0.2s, transform 0.2s;
-    }
-    #scroll-top.visible {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    #scroll-top:hover {
-      border-color: var(--accent-border);
-      color: var(--accent);
-      background: var(--accent-muted);
-      transform: translateY(-2px);
-    }
-  </style>
-
-  <script>
-    const btn = document.getElementById('scroll-top');
-    window.addEventListener('scroll', () => {
-      btn?.classList.toggle('visible', window.scrollY > 300);
-    }, { passive: true });
-    btn?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
   </script>
 </body>
 </html>

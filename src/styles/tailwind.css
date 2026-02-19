@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+/*
+  Map our existing CSS variables into Tailwind's theme so we can use
+  classes like bg-surface, text-accent, border-border etc.
+  This keeps Tailwind colors consistent with our custom palette.
+*/
+@theme {
+  --color-bg-base:      var(--bg-base);
+  --color-bg-surface:   var(--bg-surface);
+  --color-bg-elevated:  var(--bg-elevated);
+  --color-bg-overlay:   var(--bg-overlay);
+
+  --color-accent:       var(--accent);
+  --color-accent-dim:   var(--accent-dim);
+  --color-accent-muted: var(--accent-muted);
+
+  --color-border:       var(--color-border);
+
+  --color-text-primary:   var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted:     var(--text-muted);
+
+  /* Callout / badge colors */
+  --color-note:     var(--note-color);
+  --color-tip:      var(--tip-color);
+  --color-warning:  var(--warning-color);
+  --color-danger:   var(--danger-color);
+  --color-info:     var(--info-color);
+  --color-success:  var(--success-color);
+  --color-question: var(--question-color);
+  --color-abstract: var(--abstract-color);
+  --color-bug:      var(--bug-color);
+  --color-example:  var(--example-color);
+  --color-quote:    var(--quote-color);
+
+  --font-mono: var(--font-mono);
+}
