@@ -1,0 +1,101 @@
+---
+title: "Windows Authentication & Active Directory"
+description: "A guide to understanding windows authentication protocols in workgroup and AD environments. And using mimicatz to perform post-exploitation techniques like SAM and LSASS credential dumping, and more!"
+date: 2026-02-19
+tags: ["windows", "pentest", "privesc", "active directory"]
+image: "./assets/banner.webp"
+---
+
+import Callout from '../../../components/Callout.astro';
+
+# Introduction
+
+Hiya there! Welcome to the first post on my blog. I've decided to write an informative albeit lengthy post on Windows authentication and post-exploitation techniques. I've structured this and the subsequent subposts to be read sequentially. Though, if you're already familiar with certain sections, feel free to skip ahead! Happy reading, and (ethically!) hacking **;)**
+
+# Windows Authentication Process
+
+## LSA, LSASS and `lsass.exe`
+
+Before we dive into Windows authentication and how it works, we must first understand the components in charge of enforcing these security policies and performing authentication services within the Windows OS. 
+
+When you attempt to log into a Windows machine, access a network resource, or authenticate with a service, it's the responsibility of the **Local Security Authority (LSA)** to coordinate with authentication packages to carry out these operations. Moreover, the LSA defines how security decisions are made and manages components like SAM and LSA secrets.
+
+{/* ============ WORK ON ============ */}
+<Callout type="question" title="TL;DR: What are Authentication Packages?" collapsed>
+`.dll` files that sit somewhere in your system the LSA uses to facilitate authentication methods during the logon process. They're loaded during runtime when needed.
+
+When you boot into your Windows logon screen, you type in your credentials (password, PIN, smartcard, etc.) which is translated by a credential provider to a data structure the LSA understands. The LSA, despite having a list of these authentication packages, does not know what any of them do, so it instead loops through all of them finding the right one to handle the input credentials. Once it's found, the package chimes in and runs the password through some algorithm to do/produce whatever it has to during authentication.
+
+Once authentication completes successfully, the logon triggers your desktop to load.
+</Callout>
+
+While LSA is the overarching security architecture, **Local Security Authority Subsystem Service (LSASS)** (`%WINDIR%\System32\lsass.exe`) is the process that implements LSA functionality, running as a **Protected Process Light (PPL)**. Marking LSASS as a PPL prevents it from being tampered with by non-administrative processes -- we can achieve this by navigating to the registry key located at `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa` and assigning it a value `RunAsPPL` with the data `1`.
+
+On modern Windows 10/11 and Server 2019+, LSASS runs as PPL by default. We can verify this with:
+
+```powershell
+Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa" -Name "RunAsPPL"
+```
+
+A few examples of what LSA does include:
+
+- Registering a user and storing their credentials.
+- Validating user credentials against the SAM database.
+- Creating *access tokens* to enforce access control decisions.
+- Enforces local security policy (eg. account lockout settings and logon restrictions).
+
+...to name a few. We'll get into the buzzwords in a minute. How the LSA acts primarily depends on the type of network setup, and there are two main types:
+
+1. **Local/workgroup**: These are found in small offices or in houses. One such example is a Laptop running Windows, a printer and a NAS server all connected to each other in a home LAN network. These devices communicate with each other to access shared resources. 
+2. **Active Directory (AD)**: AD is essentially an infrastructure designed by Microsoft to centralize and organize network resources in Windows-based   environments. You'll find these in larger offices like *enterprise environments*.
+
+While they sound similar, there are a few differences to keep in mind.
+
+|Workgroup|Active Directory|
+|---|---|
+|Decentralized network|Centralized network|
+|Devices connected in peer-to-peer (p2p) network and share resources amongst each other.|Devices connected in a client-server network where the **Domain Controller (DC)** acts as the server for a specific domain.|
+|Every machine manages its own users, credentials, and policies independently.|Group policies, access control and security settings enforced by the DC on every device (domain-joined machine) connected to it.|
+|Scales horrendously which is why it's used in smaller setups|Designed to scale thousands of machines and users|
+
+<Callout type="tip" title="AD analogy using Severance as a reference" collapsed>
+Here's a great analogy of how an AD environment works. If you've watched Severance, then you probably know how Harmony Cobel manages the severed workers in the severed floor (Mark, Helly, Dylan, Irving, etc.). Using this you can think of Harmony Cobel as the DC, the severed floor as the domain, and the severed workers as the domain-joined devices connected to the DC. This would also imply that other departments in Lumon would also be domains with their own Harmony Cobels (DCs) and staff (devices). It's important to note that in actual AD environments, you might find more than one domain controller syncing the same data and enforcing the same policies for redundancy. 
+</Callout>
+
+Getting back to LSA, now that we've seen the two common setups we can understand how LSA's operations differ.
+
+- In workgroups, the LSA authenticates users against the local **Security Account Manager (SAM)** of the device they're trying to access.
+- In Active Directory environments, the LSA forwards authentication requests to the Domain Controller, which validates credentials against the **NTDS.dit database** -- the AD equivalent of SAM -- on behalf of the entire domain.
+
+## SAM and NTDS.dit [**WIP**]
+
+### Security Account Manager (SAM)
+
+### NTDS.dit
+
+
+## Authentication types [**WIP**]
+
+
+```mermaid
+graph LR
+	A[Authentication Protocols] --> B2[NTLM] & B3[Kerberos]
+	B2 --> B21[NTLMv1] & B22[NTLMv2]
+```
+
+### LM authentication
+
+LAN Manager (LM) authentication hashes a password by first converting it entirely into uppercase then breaking it into 2 chunks of seven characters each and encrypting each chunk via 56-bit DES (now easily crackable). Because it's not case sensitive, it can be easily cracked.
+
+### NTLM
+
+### Kerberos
+
+--- 
+
+# References
+
+- https://syfuhs.net/what-happens-when-you-type-your-password-into-windows
+- https://blog.cyberadvisors.com/technical-blog/blog/credential-dumping-protections-part-1-lsa-protection
+- https://www.elastic.co/blog/protecting-windows-protected-processes
+- https://learn.microsoft.com/en-us/windows-server/security/kerberos/ntlm-overview
