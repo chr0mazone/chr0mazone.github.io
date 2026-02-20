@@ -43,6 +43,7 @@ export const projects: Project[] = [
     title: 'C2 Framework',
     description: 'A custom C2 framework I built for my final year CS project.',
     href: 'https://github.com/chr0mazone/chip8-emulator',
+    image:"https://images3.alphacoders.com/134/1343189.png",
     tags: ['python', 'rust'],
     status: 'in-progress',
     date: 'Jan 2026',
@@ -71,8 +72,8 @@ export const skills: Skill[] = [
 
 // ============================== SOCIALS ==============================
 export const socials: Social[] = [
-  { label: 'GitHub',   href: 'https://github.com/yourusername',      icon: 'github'   },
-  { label: 'Twitter',  href: 'https://twitter.com/yourusername',     icon: 'twitter'  },
-  { label: 'LinkedIn', href: 'https://linkedin.com/in/yourusername', icon: 'linkedin' },
-  { label: 'Mail',     href: 'mailto:you@example.com',               icon: 'mail'     },
+  { label: 'GitHub',   href: 'https://github.com/chr0mazone',icon: 'github'},
+  // { label: 'Twitter',  href: 'https://twitter.com/yourusername',     icon: 'twitter'  },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/arjitpraveen/', icon: 'linkedin' },
+  { label: 'Mail',     href: 'mailto:arjitpraveen.sec@gmail.com', icon: 'mail'},
 ];
