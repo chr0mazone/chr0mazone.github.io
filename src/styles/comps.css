@@ -147,24 +147,3 @@
 .callout-body .expressive-code {
     margin: 0.75rem 0 !important;
 }
-
-/* ===================================== Responsive ===================================== */
-
-@media (max-width: 768px) {
-    .callout-header {
-        padding: 0.5rem 0.75rem;
-    }
-
-    .callout-body {
-        padding: 0.65rem 0.75rem;
-    }
-
-    .mermaid-diagram {
-        padding: 1rem 0.75rem;
-    }
-
-    .katex-display {
-        padding: 1rem 0.75rem;
-        overflow-x: auto;
-    }
-}

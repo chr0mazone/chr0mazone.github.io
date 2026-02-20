@@ -4,10 +4,11 @@
 @import url('./navfoo.css');
 @import url('./home/home.css');
 @import url('./blog/blog.css');
-@import url(./post/post.css);
+@import url('./post/post.css');
 @import url('./about/about.css');
 @import url('./comps.css');
 @import url('./layout.css');
 @import url('./fonts.css');
+@import url('responsive.css');
 
 @import url('./custom.css');

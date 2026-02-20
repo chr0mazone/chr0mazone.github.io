@@ -162,26 +162,3 @@
 .prose img[title~="center"] {
     margin: 1.25rem auto;
 }
-
-@media (max-width: 768px) {
-    .prose h1 {
-        font-size: 1.35rem;
-    }
-
-    .prose h2 {
-        font-size: 1.15rem;
-    }
-
-    .prose h3 {
-        font-size: 1rem;
-    }
-
-    .prose {
-        font-size: 0.9rem;
-    }
-
-    .prose table {
-        display: block;
-        overflow-x: auto;
-    }
-}

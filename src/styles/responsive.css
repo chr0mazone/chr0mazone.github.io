@@ -1,0 +1,374 @@
+/* ====================== Media Queries for responsiveness ====================== */
+
+/* BREAKPOINT: 1024px */
+@media (max-width: 1024px) {
+    .post-page-layout {
+        grid-template-columns: 1fr;
+        padding: 1.5rem 1.25rem;
+        gap: 1.25rem;
+    }
+
+    .post-left-sidebar,
+    .post-right-sidebar {
+        position: static;
+    }
+
+    .post-left-sidebar {
+        order: -1;
+    }
+
+    .post-left-sidebar .sidebar-panel {
+        display: none;
+    }
+
+    .post-right-sidebar {
+        order: -1;
+    }
+}
+
+/* BREAKPOINT: 768px */
+@media (max-width: 768px) {
+
+    /* ============================= BASE ============================= */
+
+    :root {
+        --nav-h: 56px;
+    }
+
+    body {
+        font-size: 0.9rem;
+    }
+
+    @keyframes menuSlideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-6px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .page-container {
+        padding: 0 1rem;
+    }
+
+    /* Navbar */
+    .navbar {
+        padding: 0 1rem;
+    }
+
+    .nav-hamburger {
+        display: flex !important;
+    }
+
+    .navbar-links {
+        display: none;
+        flex-direction: column;
+        gap: 0.25rem;
+        position: fixed;
+        top: var(--nav-h);
+        left: 0;
+        right: 0;
+        background: rgba(13, 17, 23, 0.97);
+        backdrop-filter: blur(16px);
+        border-bottom: 1px solid var(--color-border);
+        padding: 1rem;
+        z-index: 99;
+    }
+
+    .navbar-links.open {
+        display: flex;
+        animation: menuSlideDown 0.18s ease;
+    }
+
+    .navbar-links li {
+        width: 100%;
+    }
+
+    .navbar-links a {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 0.9375rem;
+        border-radius: var(--radius);
+    }
+
+    /* ============================ HOME Page ============================ */
+
+    .home-main {
+        padding: 1rem;
+        align-items: flex-start;
+        padding-top: 2rem;
+    }
+
+    .hero-card-topbar {
+        padding: 0.5rem 1rem;
+        font-size: 0.7rem;
+    }
+
+    .hero-card-topbar .topbar-right {
+        display: none;
+    }
+
+    .hero-card-body {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+        padding: 1.25rem;
+    }
+
+    .hero-avatar-wrap {
+        display: flex;
+        justify-content: center;
+    }
+
+    .hero-avatar-frame {
+        width: 110px;
+    }
+
+    .hero-name {
+        font-size: 2rem;
+    }
+
+    .hero-role {
+        font-size: 0.875rem;
+    }
+
+    .hero-bio {
+        font-size: 0.8375rem;
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .hero-buttons .btn {
+        justify-content: center;
+        width: 100%;
+    }
+
+    /* ============================ BLOG Page ============================ */
+
+    .blog-layout {
+        grid-template-columns: 1fr;
+        gap: 0;
+        padding: 1rem 0;
+    }
+
+    .blog-sidebar {
+        position: static;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        padding: 0.75rem 1rem;
+        margin-bottom: 1.25rem;
+        background: var(--bg-surface);
+    }
+
+    .blog-sidebar-toggle {
+        display: flex !important;
+    }
+
+    .blog-sidebar-body {
+        display: none;
+    }
+
+    .blog-sidebar-body.open {
+        display: flex;
+        padding-top: 1rem;
+    }
+
+    .tag-list {
+        max-height: 200px;
+    }
+
+    .tag-item {
+        padding: 0.45rem 0.5rem;
+    }
+
+    .post-card {
+        flex-direction: column;
+    }
+
+    .post-card-image-wrap {
+        width: 100%;
+        height: 180px;
+        border-left: none;
+        border-top: 1px solid var(--color-border);
+        order: -1;
+    }
+
+    .post-card-inner {
+        padding: 1rem;
+    }
+
+    .post-card-title {
+        font-size: 1rem;
+    }
+
+    .post-card-desc {
+        font-size: 0.8125rem;
+    }
+
+    .post-page-layout {
+        padding: 1rem;
+        gap: 1rem;
+    }
+
+    .post-left-sidebar,
+    .post-right-sidebar {
+        display: none;
+    }
+
+    .post-mobile-sidebars {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .post-header-image-wrap {
+        max-height: 220px;
+    }
+
+    .pagination {
+        gap: 0.3rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .pagination-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 0.8125rem;
+    }
+
+    /* ============================ ABOUT Page ============================ */
+
+    .about-layout {
+        padding: 1.5rem 0;
+    }
+
+    .about-hero {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+        padding-bottom: 0rem;
+    }
+
+    .about-avatar-placeholder,
+    .about-avatar {
+        display: none;
+    }
+
+    .about-name {
+        font-size: 2rem;
+    }
+
+    .about-links {
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .about-link {
+        padding: 0.45rem 0.75rem;
+        font-size: 0.8125rem;
+    }
+
+    .project-card {
+        width: 260px;
+    }
+
+    /* ============================= PROSE ============================= */
+
+    .prose h1 {
+        font-size: 1.35rem;
+    }
+
+    .prose h2 {
+        font-size: 1.15rem;
+    }
+
+    .prose h3 {
+        font-size: 1rem;
+    }
+
+    .prose {
+        font-size: 0.9rem;
+    }
+
+    .prose table {
+        display: block;
+        overflow-x: auto;
+    }
+
+    /* ================================== Components ================================== */
+
+    .callout-header {
+        padding: 0.5rem 0.75rem;
+    }
+
+    .callout-body {
+        padding: 0.65rem 0.75rem;
+    }
+
+    .mermaid-diagram {
+        padding: 1rem 0.75rem;
+    }
+
+    .katex-display {
+        padding: 1rem 0.75rem;
+        overflow-x: auto;
+    }
+}
+
+/* BREAKPOINT: 480px */
+
+@media (max-width: 480px) {
+
+    /* BASE */
+    .page-container {
+        padding: 0 0.75rem;
+    }
+
+    /* HOME Page */
+    .hero-name {
+        font-size: 1.75rem;
+    }
+
+    .hero-card-body {
+        padding: 1rem;
+    }
+
+    /* BLOG Page */
+    .blog-layout {
+        padding: 0.75rem 0;
+    }
+
+    .stat-value {
+        font-size: 1.25rem;
+    }
+
+    .project-card {
+        width: 240px;
+    }
+
+    /* POST Page */
+    .post-page-layout {
+        padding: 0.75rem;
+    }
+
+    .post-header-title {
+        font-size: 1.3rem;
+    }
+
+    /* Footer */
+    .footer {
+        padding: 0 1rem;
+    }
+
+    .footer-copy {
+        font-size: 0.75rem;
+    }
+}
