@@ -1,0 +1,129 @@
+/* TOC, Subpost right sidebar, Mobile sidebars */
+
+/* ============================== TOC ============================== */
+
+.toc-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.toc-item a {
+    display: block;
+    padding: 0.3rem 0.6rem;
+    border-radius: var(--radius);
+    color: var(--text-secondary);
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+    line-height: 1.4;
+}
+
+.toc-item a:hover {
+    color: var(--accent);
+    border-left-color: var(--accent-dim);
+    background: var(--accent-muted);
+}
+
+.toc-item.active a {
+    color: var(--accent);
+    border-left-color: var(--accent);
+    background: var(--accent-muted);
+}
+
+.toc-item.depth-3 a {
+    padding-left: 1.2rem;
+    font-size: 0.775rem;
+}
+
+.toc-item.depth-4 a {
+    padding-left: 1.8rem;
+    font-size: 0.75rem;
+}
+
+/* ============================== Subpost nav ============================== */
+
+.subpost-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.subpost-item a {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: var(--radius);
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+}
+
+.subpost-item a:hover {
+    color: var(--accent);
+    background: var(--accent-muted);
+    border-color: var(--accent-border);
+}
+
+.subpost-item a[aria-current="page"] {
+    color: var(--accent);
+    background: var(--accent-muted);
+    border-color: var(--accent);
+}
+
+.subpost-item.is-index a {
+    font-weight: 600;
+}
+
+/* ============================== Mobile post sidebars ============================== */
+
+.post-mobile-sidebars {
+    display: none;
+}
+
+.mobile-sidebar-panel {
+    background: var(--bg-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.mobile-sidebar-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    color: var(--text-secondary);
+    gap: 0.5rem;
+}
+
+.mobile-sidebar-toggle:hover {
+    color: var(--accent);
+}
+
+.mobile-sidebar-toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+}
+
+.mobile-sidebar-body {
+    display: none;
+    padding: 0 0.75rem 0.75rem;
+}
+
+.mobile-sidebar-body.open {
+    display: block;
+}

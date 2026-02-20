@@ -1,0 +1,163 @@
+@import url('./carousel.css');
+
+/* ====================== About page ====================== */
+
+.about-layout {
+    padding: 3rem 0;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.about-hero {
+    display: grid;
+    grid-template-columns: 1fr 200px;
+    gap: 3rem;
+    align-items: center;
+    margin-bottom: 3rem;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.about-name {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: -0.05em;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.about-name span {
+    color: var(--accent);
+}
+
+.about-role {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 1.25rem;
+}
+
+.about-role .prompt {
+    color: var(--accent);
+    margin-right: 0.35rem;
+}
+
+.about-bio {
+    color: var(--text-secondary);
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+}
+
+.about-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.about-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 1rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--color-border);
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    transition: all 0.2s;
+    background: var(--bg-surface);
+}
+
+.about-link:hover {
+    border-color: var(--accent-border);
+    color: var(--accent);
+    background: var(--accent-muted);
+}
+
+.about-avatar {
+    width: 180px;
+    height: 180px;
+    border-radius: var(--radius);
+    border: 2px solid var(--accent-border);
+    object-fit: cover;
+    box-shadow: 0 0 30px rgba(0, 212, 170, 0.1);
+}
+
+.about-avatar-placeholder {
+    width: 180px;
+    height: 180px;
+    background: var(--bg-elevated);
+    border: 2px solid var(--accent-border);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+}
+
+.projects-section h2 {
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* ====================== Skills badges ====================== */
+
+.skills-section {
+    margin-top: 3rem;
+}
+
+.skills-section h2 {
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.skills-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+/* ====================== Responsive ====================== */
+
+@media (max-width: 768px) {
+    .about-layout {
+        padding: 1.5rem 0;
+    }
+
+    .about-hero {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+        padding-bottom: 0rem;
+    }
+
+    .about-avatar-placeholder,
+    .about-avatar {
+        display: none;
+    }
+
+    .about-name {
+        font-size: 2rem;
+    }
+
+    .about-links {
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .about-link {
+        padding: 0.45rem 0.75rem;
+        font-size: 0.8125rem;
+    }
+
+    .project-card {
+        width: 260px;
+    }
+}

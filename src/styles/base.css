@@ -1,0 +1,73 @@
+:root {
+    --bg-base: #0d1117;
+    --bg-surface: #111827;
+    --bg-elevated: #1a2332;
+    --bg-overlay: #1e2d3d;
+    --accent: #00d4aa;
+    --accent-dim: #00a885;
+    --accent-muted: rgba(0, 212, 170, 0.12);
+    --accent-border: rgba(0, 212, 170, 0.25);
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --text-accent: #00d4aa;
+    --color-border: #1e3a4a;
+    --color-border-hover: #2a5060;
+    --note-color: #60a5fa;
+    --note-bg: rgba(96, 165, 250, 0.08);
+    --tip-color: #34d399;
+    --tip-bg: rgba(52, 211, 153, 0.08);
+    --warning-color: #fbbf24;
+    --warning-bg: rgba(251, 191, 36, 0.08);
+    --danger-color: #f87171;
+    --danger-bg: rgba(248, 113, 113, 0.08);
+    --info-color: #a78bfa;
+    --info-bg: rgba(167, 139, 250, 0.08);
+    --success-color: #4ade80;
+    --success-bg: rgba(74, 222, 128, 0.08);
+    --question-color: #22d3ee;
+    --question-bg: rgba(34, 211, 238, 0.08);
+    --abstract-color: #818cf8;
+    --abstract-bg: rgba(129, 140, 248, 0.08);
+    --bug-color: #fb923c;
+    --bug-bg: rgba(251, 146, 60, 0.08);
+    --example-color: #c084fc;
+    --example-bg: rgba(192, 132, 252, 0.08);
+    --quote-color: #94a3b8;
+    --quote-bg: rgba(148, 163, 184, 0.08);
+    --grid-color: rgba(0, 212, 170, 0.04);
+    --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+    --font-sans: 'JetBrains Mono', monospace;
+    --nav-h: 60px;
+    --footer-h: 48px;
+    --radius: 6px;
+    --radius-lg: 10px;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    /* padding: 0; */
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: calc(var(--nav-h) + 1rem);
+}
+
+body {
+    font-family: var(--font-mono);
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    line-height: 1.7;
+    font-size: 0.9375rem;
+    min-height: 100vh;
+    padding-bottom: var(--footer-h);
+    background-image:
+        linear-gradient(var(--grid-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-attachment: fixed;
+}

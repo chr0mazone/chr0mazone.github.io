@@ -1,0 +1,110 @@
+@import url('./prose.css');
+@import url('./sidebars.css');
+
+/* ============================== Post page ============================== */
+
+.post-page-layout {
+    display: grid;
+    grid-template-columns: 220px 1fr 220px;
+    gap: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+    align-items: start;
+}
+
+.post-left-sidebar,
+.post-right-sidebar {
+    position: sticky;
+    top: calc(var(--nav-h) + 1.5rem);
+    font-size: 0.8125rem;
+}
+
+.sidebar-panel {
+    background: var(--bg-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+}
+
+.sidebar-panel+.sidebar-panel {
+    margin-top: 1rem;
+}
+
+/* ============================== Post content ============================== */
+
+.post-content {
+    min-width: 0;
+}
+
+.post-header {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.post-header-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+}
+
+.post-header-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.03em;
+}
+
+.post-header-desc {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+.post-header-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+/* ============================== Responsive ============================== */
+
+@media (max-width: 1024px) {
+    .post-page-layout {
+        grid-template-columns: 1fr;
+        padding: 1.5rem 1.25rem;
+        gap: 1.25rem;
+    }
+
+    .post-left-sidebar,
+    .post-right-sidebar {
+        position: static;
+    }
+
+    .post-left-sidebar {
+        order: -1;
+    }
+
+    .post-left-sidebar .sidebar-panel {
+        display: none;
+    }
+
+    .post-right-sidebar {
+        order: -1;
+    }
+}
+
+@media (max-width: 480px) {
+    .post-page-layout {
+        padding: 0.75rem;
+    }
+
+    .post-header-title {
+        font-size: 1.3rem;
+    }
+}
