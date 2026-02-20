@@ -19,6 +19,14 @@ a:hover {
     color: var(--accent-dim);
 }
 
+strong {
+    color: var(--color-tip);
+}
+
+blockquote > p {
+    margin-bottom: 0 !important;
+}
+
 code {
     font-family: var(--font-mono);
     font-size: 0.875em;
