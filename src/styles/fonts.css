@@ -13,6 +13,7 @@ a {
     color: var(--accent);
     text-decoration: none;
     transition: color 0.2s;
+    word-break: break-all;
 }
 
 a:hover {
@@ -34,6 +35,7 @@ code {
     border: 1px solid var(--color-border);
     border-radius: 0;
     padding: 0.1em 0.35em;
+    word-break: break-all;
 }
 
 pre code {
