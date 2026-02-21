@@ -17,6 +17,10 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content } = await post.render();
 
+const wordsPerMinute = 200;
+const wordCount = post.body.trim().split(/\s+/).length;
+const readingTime = Math.ceil(wordCount / wordsPerMinute);
+
 // Normalize image: local images come back as { src, width, height, ... }, external URLs are plain strings
 const imageStr = post.data.image
   ? (typeof post.data.image === 'string' ? post.data.image : post.data.image.src)
@@ -62,6 +66,7 @@ const subposts = siblings
   parentSlug={parentSlug}
   currentSlug={post.slug}
   subposts={subposts.length > 1 ? subposts : []}
+  readingTime={readingTime}
 >
   <Content />
 </PostLayout>
