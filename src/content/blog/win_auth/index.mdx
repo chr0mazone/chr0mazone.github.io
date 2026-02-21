@@ -8,9 +8,9 @@ image: "./assets/banner.webp"
 
 import Callout from '../../../components/Callout.astro';
 
-# Introduction
+{/* # Introduction */}
 
-Hiya there! Welcome to the first post on my blog. I've decided to write an informative albeit lengthy post on Windows authentication and post-exploitation techniques. I've structured this and the subsequent subposts to be read sequentially. Though, if you're already familiar with certain sections, feel free to skip ahead! Happy reading, and (ethically!) hacking **;)**
+Hiya there! Welcome to the first post on my blog. I've decided to write an informative albeit lengthy post on Windows authentication and post-exploitation techniques. If you're already familiar with the sections, feel free to skip ahead! Happy reading, and (ethically) hacking **;)**
 
 # Windows Authentication Process
 
@@ -21,12 +21,24 @@ Before we dive into Windows authentication and how it works, we must first under
 When you attempt to log into a Windows machine, access a network resource, or authenticate with a service, it's the responsibility of the **Local Security Authority (LSA)** to coordinate with authentication packages to carry out these operations. Moreover, the LSA defines how security decisions are made and manages components like SAM and LSA secrets.
 
 {/* ============ WORK ON ============ */}
-<Callout type="question" title="TL;DR: What are Authentication Packages?" collapsed>
-`.dll` files that sit somewhere in your system the LSA uses to facilitate authentication methods during the logon process. They're loaded during runtime when needed.
+<Callout type="warning" title="TL;DR: What are Authentication Packages?" collapsed>
+These are `.dll` (Port Executable) files that sit somewhere in your system the LSA uses to facilitate authentication methods during the logon process. They have no entrypoint (`main`) and are designed to be loaded from another process's memory (in this case `lsass.exe`) and called from there during runtime.
 
 When you boot into your Windows logon screen, you type in your credentials (password, PIN, smartcard, etc.) which is translated by a credential provider to a data structure the LSA understands. The LSA, despite having a list of these authentication packages, does not know what any of them do, so it instead loops through all of them finding the right one to handle the input credentials. Once it's found, the package chimes in and runs the password through some algorithm to do/produce whatever it has to during authentication.
 
 Once authentication completes successfully, the logon triggers your desktop to load.
+
+<Callout type="example" title="Authentication Packages" collapsed>
+|Package|Description|
+|---|---|
+|`Lsasrv.dll` |Core of LSASS & acts as the security packet manager for LSA. Contains the negotiate function which determines what authentication protocol to use, preferring Kerberos (`Kerberos.dll`) but falls back to NTLM (`Msv1_0.dll`) if Kerberos isn't available.|
+|`Msv1_0.dll`|Handles **NTLM**. Used for local authentication/auth with a machine without Kerberos. Generates & caches NT hash of passwords in LSASS which is targeted by mimikatz during post-exploitation.|
+|`Kerberos.dll` **[SPACER_LG]**|Handles **Kerberos** authentication in AD environments. When you log into a domain, `Kerberos.dll` communicates with DC to obtain tickets (TGTs) used for authenticating to resources.|
+|`Samsrv.dll`|**SAM server library**. Implements actual logic for interacting with SAM database (`C:\Windows\System32\config\SAM`). R/W user acc. info and password hashes, enforce account policies and exposes SAM functionalities to LSASS via RPC so other components can query/modify accounts.|
+|`Ntdsa.dll`|AD equivalent of `Samsrv.dll`. **Directory Service Agent (DSA)** and lives in DC. R/W to NTDS.dit (AD database), handles LDAP queries and handles replication between DCs (sync)|
+|`Netlogon.dll`|Implements **Netlogon service** responsible for authenticating users & machines in domain environments. Ferries authentication requests securely between machine's LSASS and DC's LSASS. Was also subject to [Zerologon vulnerability (CVE-2020-1472)](https://www.huntress.com/threat-library/vulnerabilities/cve-2020-1472).|
+</Callout>
+
 </Callout>
 
 While LSA is the overarching security architecture, **Local Security Authority Subsystem Service (LSASS)** (`%WINDIR%\System32\lsass.exe`) is the process that implements LSA functionality, running as a **Protected Process Light (PPL)**. Marking LSASS as a PPL prevents it from being tampered with by non-administrative processes -- we can achieve this by navigating to the registry key located at `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa` and assigning it a value `RunAsPPL` with the data `1`.
@@ -79,11 +91,11 @@ Getting back to LSA, now that we've seen the two common setups we can understand
 
 ```mermaid
 graph LR
-	A[Authentication Protocols] --> B2[NTLM] & B3[Kerberos]
+	A[Authentication Protocols] --> B1[LM] & B2[NTLM] & B3[Kerberos]
 	B2 --> B21[NTLMv1] & B22[NTLMv2]
 ```
 
-### LM authentication
+### LM authentication (Deprecated)
 
 LAN Manager (LM) authentication hashes a password by first converting it entirely into uppercase then breaking it into 2 chunks of seven characters each and encrypting each chunk via 56-bit DES (now easily crackable). Because it's not case sensitive, it can be easily cracked.
 
