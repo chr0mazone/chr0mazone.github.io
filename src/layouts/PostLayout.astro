@@ -13,9 +13,10 @@ interface Props {
   parentSlug: string;
   currentSlug: string;
   subposts: Array<{ slug: string; title: string; href: string }>;
+  readingTime: number;
 }
 
-const { title, description, date, tags = [], image, parentSlug, subposts } = Astro.props;
+const { title, description, date, tags = [], image, parentSlug, subposts, readingTime } = Astro.props;
 
 const formattedDate = date.toLocaleDateString('en-US', {
   month: 'long', day: 'numeric', year: 'numeric'
@@ -78,7 +79,12 @@ const formattedDate = date.toLocaleDateString('en-US', {
           </a>
           <span>/</span>
           <span>{parentSlug}</span>
-          <span style="margin-left:auto;">{formattedDate}</span>
+          <!-- <span style="margin-left:auto;">{formattedDate}</span>
+          <span style="color:var(--color-tip);">{readingTime} min read</span> -->
+          <span class="post-header-meta-right">
+            <span>{formattedDate}</span>
+            <span class="read-time">{readingTime} min read</span>
+          </span>
         </div>
         <h1 class="post-header-title">{title}</h1>
         {description && <p class="post-header-desc">{description}</p>}

@@ -13,11 +13,14 @@ a {
     color: var(--accent);
     text-decoration: none;
     transition: color 0.2s;
-    word-break: break-all;
 }
 
 a:hover {
     color: var(--accent-dim);
+}
+
+.prose a {
+    word-break: break-all;
 }
 
 strong {

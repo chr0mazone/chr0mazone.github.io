@@ -78,6 +78,10 @@
     font-weight: 600;
 }
 
+.subpost-item a svg {
+    flex-shrink: 0;
+}
+
 /* ============================== Mobile post sidebars ============================== */
 
 .post-mobile-sidebars {
