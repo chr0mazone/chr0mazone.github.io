@@ -2,7 +2,8 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import Badge from '../components/Badge.astro';
-import { Github, Twitter, Mail, Monitor, Shield, Linkedin } from 'lucide-astro';
+import { Mail, Monitor, Shield, Linkedin } from '@lucide/astro';
+import { siGithub, siLinkerd } from 'simple-icons';
 import { projects, skills } from '../data/projects';
 ---
 
@@ -22,14 +23,20 @@ import { projects, skills } from '../data/projects';
             Hey there! Welcome to my blog :D I'm Arjit, an undergrad CS student and cybersecurity enthusiast. I enjoy doing HTB machines, playing in CTFs, and building stuff. And when I'm not doing either of those, I'm probably reading a book, play Sky COTL, the piano or doing math. I dedicated this blog to documenting my learning progress and sharing it to those who it might help. Happy reading!
           </p>
           <div class="about-links">
-            <a href="www.linkedin.com/in/arjitpraveen" target="_blank" rel="noopener" class="about-link">
-              <Github size={15} strokeWidth={2} aria-hidden="true" /> GitHub
+            <a href="https://github.com/chr0mazone" target="_blank" rel="noopener" class="about-link">
+              <svg role="img" viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d={siGithub.path} /></svg>
+              GitHub
             </a>
+            <!-- <a href="https://www.linkedin.com/in/arjitpraveen/" target="_blank" rel="noopener" class="about-link">
+              <svg role="img" viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d={siLinkerd.path} /></svg>
+              LinkedIn
+            </a> -->
             <a href="https://www.linkedin.com/in/arjitpraveen/" target="_blank" rel="noopener" class="about-link">
-              <Linkedin size={15} strokeWidth={2} aria-hidden="true" /> Linkedin
+              <Linkedin size={15} stroke-width={2} aria-hidden="true" /> Linkedin
             </a>
             <a href="mailto:arjitpraveen.sec@gmail.com" class="about-link">
-              <Mail size={15} strokeWidth={2} aria-hidden="true" /> Email
+              <Mail size={15} stroke-width={2} aria-hidden="true" />
+              Email
             </a>
           </div>
         </div>
@@ -42,7 +49,7 @@ import { projects, skills } from '../data/projects';
       <!-- Projects carousel -->
       <section class="projects-section">
         <h2>
-          <Monitor size={18} strokeWidth={2} aria-hidden="true" />
+          <Monitor size={18} stroke-width={2} aria-hidden="true" />
           Projects
         </h2>
         <div class="projects-carousel-wrap">
@@ -55,7 +62,7 @@ import { projects, skills } from '../data/projects';
       <!-- Skills -->
       <section class="skills-section">
         <h2>
-          <Shield size={18} strokeWidth={2} aria-hidden="true" />
+          <Shield size={18} stroke-width={2} aria-hidden="true" />
           Skills &amp; Interests
         </h2>
         <div class="skills-badges">

@@ -35,6 +35,10 @@
     --example-bg: rgba(192, 132, 252, 0.08);
     --quote-color: #94a3b8;
     --quote-bg: rgba(148, 163, 184, 0.08);
+    /* --tldr-color:  #f472b6;
+    --tldr-bg:     rgba(244, 114, 182, 0.08); */
+    --tldr-color:  #fbffb1;
+    --tldr-bg:     rgba(239, 192, 134, 0.08);
     --grid-color: rgba(0, 212, 170, 0.04);
     --font-mono: 'JetBrains Mono', 'Consolas', monospace;
     --font-sans: 'JetBrains Mono', monospace;

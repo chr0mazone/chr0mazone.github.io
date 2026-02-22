@@ -2,7 +2,7 @@
 import BaseLayout from './BaseLayout.astro';
 import Badge from '../components/Badge.astro';
 import { CollapsiblePanel } from '../components/ui/collapsible';
-import { List, Home, FileText, ChevronLeft } from 'lucide-astro';
+import { List, Home, FileText, ChevronLeft } from '@lucide/astro';
 
 interface Props {
   title: string;
@@ -30,7 +30,7 @@ const formattedDate = date.toLocaleDateString('en-US', {
     <aside class="post-left-sidebar">
       <div class="sidebar-panel">
         <div class="sidebar-section-title">
-          <List size={13} strokeWidth={2} aria-hidden="true" />
+          <List size={13} stroke-width={3} aria-hidden="true" />
           ON THIS PAGE
         </div>
         <nav id="toc">
@@ -51,8 +51,8 @@ const formattedDate = date.toLocaleDateString('en-US', {
                 <li class:list={['subpost-item', sp.slug === 'index' && 'is-index']}>
                   <a href={sp.href} aria-current={sp.href === Astro.url.pathname ? 'page' : undefined}>
                     {sp.slug === 'index'
-                      ? <Home size={12} strokeWidth={2} aria-hidden="true" />
-                      : <FileText size={12} strokeWidth={2} aria-hidden="true" />
+                      ? <Home size={12} stroke-width={2} aria-hidden="true" />
+                      : <FileText size={12} stroke-width={2} aria-hidden="true" />
                     }
                     {sp.title}
                   </a>
@@ -74,7 +74,7 @@ const formattedDate = date.toLocaleDateString('en-US', {
         )}
         <div class="post-header-meta">
           <a href="/blog" style="color:var(--text-muted); display:flex; align-items:center; gap:0.3rem;">
-            <ChevronLeft size={13} strokeWidth={2} aria-hidden="true" />
+            <ChevronLeft size={13} stroke-width={2} aria-hidden="true" />
             blog
           </a>
           <span>/</span>
@@ -103,7 +103,7 @@ const formattedDate = date.toLocaleDateString('en-US', {
       <aside class="post-right-sidebar">
         <div class="sidebar-panel">
           <div class="sidebar-section-title">
-            <FileText size={13} strokeWidth={2} aria-hidden="true" />
+            <FileText size={13} stroke-width={2} aria-hidden="true" />
             SECTIONS
           </div>
           <ul class="subpost-list">
@@ -111,8 +111,8 @@ const formattedDate = date.toLocaleDateString('en-US', {
               <li class:list={['subpost-item', sp.slug === 'index' && 'is-index']}>
                 <a href={sp.href} aria-current={sp.href === Astro.url.pathname ? 'page' : undefined}>
                   {sp.slug === 'index'
-                    ? <Home size={12} strokeWidth={2} aria-hidden="true" />
-                    : <FileText size={12} strokeWidth={2} aria-hidden="true" />
+                    ? <Home size={12} stroke-width={2} aria-hidden="true" />
+                    : <FileText size={12} stroke-width={2} aria-hidden="true" />
                   }
                   {sp.title}
                 </a>

@@ -12,7 +12,7 @@ export interface Project {
 export interface Social {
   label: string;
   href: string;
-  icon: 'github' | 'twitter' | 'linkedin' | 'youtube' | 'discord' | 'mail' | 'rss';
+  icon: 'github' | 'linkedin'| 'mail';
 }
 
 export interface Skill {

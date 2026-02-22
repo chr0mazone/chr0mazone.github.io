@@ -14,7 +14,9 @@ Before we dive into Windows authentication and how it works, we must first under
 
 ## WinLogon, LogonUI, and Credential Providers
 
-> TL;DR: "Logon" (Microslop's preferred naming convention instead of "Login") is the entire process of you entering your creds in a fancy UI rendered by a process (`%SystemRoot%\System32\LogonUI.exe`) launched by a critical system process (`WinLogon.exe`). A credential provider collects it and translates it into a data structure understood by LSASS, sends it back to WinLogon, which relays it to LSASS. 
+<Callout type='tldr' collapsed>
+"Logon" (Microsoft's preferred naming convention instead of "Login") is the entire process of you entering your creds in a fancy UI rendered by a process (`%SystemRoot%\System32\LogonUI.exe`) launched by a critical system process (`WinLogon.exe`). A credential provider collects it and translates it into a data structure understood by LSASS, sends it back to WinLogon, which relays it to LSASS. 
+</Callout>
 
 ### WinLogon
 
@@ -32,7 +34,9 @@ Before we dive into Windows authentication and how it works, we must first under
 
 ## LSA, LSASS and Authentication Packages
 
-> TL;DR: LSA is an overall security architecture which enforces security policies and authenticate users. LSASS is the process which implements LSA functionalities. Runs as `lsass.exe` and pulls authentication packages (modular libraries --`.ddl`s), when needed depending on environment (Workgroup/AD).
+<Callout type='tldr' collapsed>
+LSA is an overall security architecture which enforces security policies and authenticate users. LSASS is the process which implements LSA functionalities. Runs as `lsass.exe` and pulls authentication packages (modular libraries --`.ddl`s), when needed depending on environment (Workgroup/AD).
+</Callout>
 
 ### LSA & Authentication Packages
 
@@ -101,7 +105,9 @@ Getting back to LSA, now that we've seen the two common setups we can understand
 
 ## Credential Manager, SAM and NTDS.dit [**WIP**]
 
-> SAM and NTDS.dit are credential stores. SAM is found on individual machines in workgroup environments and is accessed by the local LSASS via `samsrv.dll`. NTDS.dit lives on Domain Controllers in AD environments — when a domain-joined machine needs to authenticate a user, it forwards the request to the DC via `netlogon.dll`, where the DC's own LSASS interfaces with NTDS.dit through `ntdsa.dll`.
+<Callout type='tldr' collapsed>
+SAM and NTDS.dit are credential stores. SAM is found on individual machines in workgroup environments and is accessed by the local LSASS via `samsrv.dll`. NTDS.dit lives on Domain Controllers in AD environments — when a domain-joined machine needs to authenticate a user, it forwards the request to the DC via `netlogon.dll`, where the DC's own LSASS interfaces with NTDS.dit through `ntdsa.dll`.
+</Callout>
 
 ### Security Account Manager (SAM)
 

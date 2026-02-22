@@ -2,11 +2,11 @@
 import {
   Pencil, Lightbulb, TriangleAlert, Flame, Info,
   CircleCheck, HelpCircle, Clipboard, Bug, List,
-  Quote, ChevronUp
-} from 'lucide-astro';
+  Quote, ChevronUp, Asterisk
+} from '@lucide/astro';
 
 interface Props {
-  type?: 'note' | 'tip' | 'warning' | 'danger' | 'info' | 'success' | 'question' | 'abstract' | 'bug' | 'example' | 'quote';
+  type?: 'note' | 'tip' | 'warning' | 'danger' | 'info' | 'success' | 'question' | 'abstract' | 'bug' | 'example' | 'quote' | 'tldr';
   title?: string;
   collapsed?: boolean;
 }
@@ -25,6 +25,7 @@ const variants = {
   bug:      { color: 'var(--bug-color)',      icon: Bug,           label: 'Bug',      bg: 'var(--bug-bg)'      },
   example:  { color: 'var(--example-color)',  icon: List,          label: 'Example',  bg: 'var(--example-bg)'  },
   quote:    { color: 'var(--quote-color)',    icon: Quote,         label: 'Quote',    bg: 'var(--quote-bg)'    },
+  tldr: {color: 'var(--tldr-color)', icon: Asterisk, label: 'TL;DR', bg:'var(--tldr-bg)'},
 } as const;
 
 const v = variants[type] ?? variants.note;
@@ -39,10 +40,10 @@ const displayTitle = title ?? v.label;
 >
   <div class="callout-header" data-callout-header>
     <div class="callout-title-wrap">
-      <Icon size={16} strokeWidth={2} class="callout-icon" aria-hidden="true" />
+      <Icon size={16} stroke-width={3} class="callout-icon" aria-hidden="true" />
       <span>{displayTitle}</span>
     </div>
-    <ChevronUp size={16} strokeWidth={2} class="callout-toggle" aria-hidden="true" />
+    <ChevronUp size={16} stroke-width={3} class="callout-toggle" aria-hidden="true" />
   </div>
   <div class="callout-body">
     <slot />

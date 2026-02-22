@@ -1,23 +1,33 @@
 ---
-import { Github, Heart, Twitter, Linkedin, Youtube, MessageCircle, Mail, Rss } from 'lucide-astro';
+import { Heart, Mail, Github, Linkedin } from '@lucide/astro';
+import { siGithub, siLinkerd } from 'simple-icons';
 import { socials } from '../data/projects';
 
 const year = new Date().getFullYear();
 
-const iconMap = { github: Github, twitter: Twitter, linkedin: Linkedin, youtube: Youtube, discord: MessageCircle, mail: Mail, rss: Rss };
+const iconMap = { github: Github, linkedin: Linkedin, mail: Mail };
+
+const siIconMap: Record<string, string> = {
+  github:   siGithub.path,
+  // linkedin: siLinkerd.path,
+};
 ---
 
 <footer class="footer">
   <div class="footer-inner">
     <span class="footer-copy">
-      &copy; {year}  Made with <span style="display: inline-flex;" class="footer-brand"><Heart size={14}></Heart></span> by <span class="footer-brand">arjit</span>
+      &copy; 2025 - {year} Made with <span style="display: inline-flex;" class="footer-brand"><Heart size={14} /></span> by <span class="footer-brand">arjit</span>
     </span>
     <nav class="footer-socials" aria-label="Social links">
       {socials.map(({ label, href, icon }) => {
-        const Icon = iconMap[icon] ?? Github;
+        const siPath = siIconMap[icon];
+        const Icon = iconMap[icon] ?? Mail;
         return (
           <a href={href} target={href.startsWith('mailto') ? undefined : '_blank'} rel="noopener noreferrer" aria-label={label} class="footer-social-link">
-            <Icon size={16} stroke-width={2} aria-hidden="true" />
+            {siPath
+              ? <svg role="img" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d={siPath} /></svg>
+              : <Icon size={16} stroke-width={2} aria-hidden="true" />
+            }
           </a>
         );
       })}
