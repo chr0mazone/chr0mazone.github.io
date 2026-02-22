@@ -2,21 +2,39 @@
 title: "Windows Authentication & Active Directory"
 description: "A guide to understanding windows authentication protocols in workgroup and AD environments. And using mimicatz to perform post-exploitation techniques like SAM and LSASS credential dumping, and more!"
 date: 2026-02-19
-tags: ["windows", "pentest", "privesc", "active directory"]
-image: "./assets/banner.webp"
+tags: ["windows", "pentest", "privesc"]
+image: "./assets/Auth_process1.png"
 ---
 
 import Callout from '../../../components/Callout.astro';
 
-{/* # Introduction */}
-
-Hiya there! Welcome to the first post on my blog. I've decided to write an informative albeit lengthy post on Windows authentication and post-exploitation techniques. If you're already familiar with the sections, feel free to skip ahead! Happy reading, and (ethically) hacking **;)**
-
 # Windows Authentication Process
 
-## LSA, LSASS and `lsass.exe`
-
 Before we dive into Windows authentication and how it works, we must first understand the components in charge of enforcing these security policies and performing authentication services within the Windows OS. 
+
+## WinLogon, LogonUI, and Credential Providers
+
+> TL;DR: "Logon" (Microslop's preferred naming convention instead of "Login") is the entire process of you entering your creds in a fancy UI rendered by a process (`%SystemRoot%\System32\LogonUI.exe`) launched by a critical system process (`WinLogon.exe`). A credential provider collects it and translates it into a data structure understood by LSASS, sends it back to WinLogon, which relays it to LSASS. 
+
+### WinLogon
+
+
+
+### LogonUI 
+
+
+
+### Credential Providers
+
+
+
+
+
+## LSA, LSASS and Authentication Packages
+
+> TL;DR: LSA is an overall security architecture which enforces security policies and authenticate users. LSASS is the process which implements LSA functionalities. Runs as `lsass.exe` and pulls authentication packages (modular libraries --`.ddl`s), when needed depending on environment (Workgroup/AD).
+
+### LSA & Authentication Packages
 
 When you attempt to log into a Windows machine, access a network resource, or authenticate with a service, it's the responsibility of the **Local Security Authority (LSA)** to coordinate with authentication packages to carry out these operations. Moreover, the LSA defines how security decisions are made and manages components like SAM and LSA secrets.
 
@@ -24,9 +42,7 @@ When you attempt to log into a Windows machine, access a network resource, or au
 <Callout type="warning" title="TL;DR: What are Authentication Packages?" collapsed>
 These are `.dll` (Port Executable) files that sit somewhere in your system the LSA uses to facilitate authentication methods during the logon process. They have no entrypoint (`main`) and are designed to be loaded from another process's memory (in this case `lsass.exe`) and called from there during runtime.
 
-When you boot into your Windows logon screen, you type in your credentials (password, PIN, smartcard, etc.) which is translated by a credential provider to a data structure the LSA understands. The LSA, despite having a list of these authentication packages, does not know what any of them do, so it instead loops through all of them finding the right one to handle the input credentials. Once it's found, the package chimes in and runs the password through some algorithm to do/produce whatever it has to during authentication.
-
-Once authentication completes successfully, the logon triggers your desktop to load.
+The LSA, having a list of these authentication packages, does not know what any of them do, so it instead loops through all of them until it finds the right one to successfully handle the input credentials. Once it's found, the package chimes in and runs the password through some algorithm to do whatever it has to during authentication. Upon completion, the logon triggers your desktop to load.
 
 <Callout type="example" title="Authentication Packages" collapsed>
 |Package|Description|
@@ -41,6 +57,8 @@ Once authentication completes successfully, the logon triggers your desktop to l
 
 </Callout>
 
+### LSASS
+
 While LSA is the overarching security architecture, **Local Security Authority Subsystem Service (LSASS)** (`%WINDIR%\System32\lsass.exe`) is the process that implements LSA functionality, running as a **Protected Process Light (PPL)**. Marking LSASS as a PPL prevents it from being tampered with by non-administrative processes -- we can achieve this by navigating to the registry key located at `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa` and assigning it a value `RunAsPPL` with the data `1`.
 
 On modern Windows 10/11 and Server 2019+, LSASS runs as PPL by default. We can verify this with:
@@ -48,6 +66,8 @@ On modern Windows 10/11 and Server 2019+, LSASS runs as PPL by default. We can v
 ```powershell
 Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa" -Name "RunAsPPL"
 ```
+
+### More on LSA, Workgroups and AD
 
 A few examples of what LSA does include:
 
@@ -79,7 +99,9 @@ Getting back to LSA, now that we've seen the two common setups we can understand
 - In workgroups, the LSA authenticates users against the local **Security Account Manager (SAM)** of the device they're trying to access.
 - In Active Directory environments, the LSA forwards authentication requests to the Domain Controller, which validates credentials against the **NTDS.dit database** -- the AD equivalent of SAM -- on behalf of the entire domain.
 
-## SAM and NTDS.dit [**WIP**]
+## Credential Manager, SAM and NTDS.dit [**WIP**]
+
+> SAM and NTDS.dit are credential stores. SAM is found on individual machines in workgroup environments and is accessed by the local LSASS via `samsrv.dll`. NTDS.dit lives on Domain Controllers in AD environments — when a domain-joined machine needs to authenticate a user, it forwards the request to the DC via `netlogon.dll`, where the DC's own LSASS interfaces with NTDS.dit through `ntdsa.dll`.
 
 ### Security Account Manager (SAM)
 
@@ -87,6 +109,8 @@ Getting back to LSA, now that we've seen the two common setups we can understand
 
 
 ## Authentication types [**WIP**]
+
+> TL;DR: LM is crackable so deprecated. NTLM uses challeng-response mechanism to authenticate a user without having the password sent over the network. Kerberos provide users with tickets (reusable stuff) which they can use to authenticate with network resources.
 
 
 ```mermaid
@@ -107,6 +131,7 @@ LAN Manager (LM) authentication hashes a password by first converting it entirel
 
 # References
 
+- https://academy.hackthebox.com/module/147/section/1313
 - https://syfuhs.net/what-happens-when-you-type-your-password-into-windows
 - https://blog.cyberadvisors.com/technical-blog/blog/credential-dumping-protections-part-1-lsa-protection
 - https://www.elastic.co/blog/protecting-windows-protected-processes
