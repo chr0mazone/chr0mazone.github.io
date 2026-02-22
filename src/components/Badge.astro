@@ -2,23 +2,16 @@
 /**
  * Badge.astro
  *
- * Define your own tags here. Each entry takes:
- *   keywords: string[]   — tag names that match this badge (lowercased)
- *   label:    string     — display text
- *   color:    string     — Tailwind classes: bg-* text-* border-*
- *   icon:     any        — lucide-react icon component
+ * Smart wrapper around ui/badge.tsx.
+ * All tag definitions live in src/lib/tag-definitions.ts — edit them there.
  *
- * Unknown tags fall back to a grey default badge.
+ * Usage:
+ *   <Badge tag="rust" />
+ *   <Badge tag="anything-unknown" />  ← falls back to grey default
  */
 
 import { Badge as BadgePrimitive } from '@/components/ui/badge';
-import {
-  Cpu, Code, Globe, Zap, Flag, Shield, Bug, Crosshair,
-  Search, Lock, Eye, Wifi, Terminal, Monitor, Server,
-  BookOpen, Hash, Database, Binary, Layers, Wrench,
-  FileText, Network, Key, Skull, Target, Loader2,
-  FlaskConical, Swords, Trophy,
-} from 'lucide-react';
+import { resolveTag } from '@/lib/tag-definitions';
 
 interface Props {
   tag: string;
@@ -27,80 +20,7 @@ interface Props {
 
 const { tag, class: className } = Astro.props;
 
-// ======================== Define your badges here ========================
-// color uses standard Tailwind v3-style classes (Tailwind v4 supports them)
-
-const definitions = [
-  // =============================== Languages ===============================
-  { keywords: ['rust'],        label: 'Rust',       color: 'bg-orange-950/40 text-orange-300 border-orange-700',   icon: Cpu       },
-  { keywords: ['python'],      label: 'Python',     color: 'bg-blue-950/40   text-blue-300   border-blue-700',     icon: Code      },
-  { keywords: ['javascript', 'js'], label: 'JS',    color: 'bg-yellow-950/40 text-yellow-300 border-yellow-700',  icon: Code      },
-
-  // =============================== CTFs ===============================
-  { 
-    keywords: ['ctf'], label: 'CTF', color: 'bg-green-950/40  text-green-300  border-green-700', icon: Flag     
-  },
-  { 
-    keywords: ['pwn'], label: 'Pwn', color: 'bg-red-950/40    text-red-300    border-red-700', icon: Zap       
-  },
-  { 
-    keywords: ['bof'], label: 'BoF', color: 'bg-orange-950/40 text-orange-300 border-orange-700', icon: Zap       
-  },
-  { 
-    keywords: ['rev', 're'], label: 'RE', color: 'bg-purple-950/40 text-purple-300 border-purple-700', icon: Search    
-  },
-  { 
-    keywords: ['osint'], label: 'OSINT', color: 'bg-cyan-950/40    text-cyan-300    border-cyan-700', icon: Eye       
-  },
-  { 
-    keywords: ['network'], label: 'Network', color: 'bg-blue-950/40    text-blue-300    border-blue-700', icon: Wifi      
-  },
-  { 
-    keywords: ['crypto'], label: 'Crypto', color: 'bg-purple-950/40  text-purple-300  border-purple-700', icon: Lock      
-  },
-  { 
-    keywords: ['forensics'], label: 'Forensics', color: 'bg-yellow-950/40  text-yellow-300  border-yellow-700', icon: Search    
-  },
-  { 
-    keywords: ['malware'], label: 'Malware', color: 'bg-red-950/40     text-red-300     border-red-700', icon: Bug       
-  },
-  { 
-    keywords: ['steganography', 'stego'], label: 'Stego', color: 'bg-indigo-950/40 text-indigo-300 border-indigo-700', icon: Eye      
-  },
-  { 
-    keywords: ['web'], label: 'Web', color: 'bg-cyan-950/40   text-cyan-300   border-cyan-700', icon: Globe     
-  },
-
-  // ============================ Security disciplines ============================
-  { keywords: ['pentest'],       label: 'Pentest',      color: 'bg-emerald-950/40 text-emerald-300 border-emerald-700', icon: Crosshair },
-  { keywords: ['red-team'],      label: 'Red Team',     color: 'bg-red-950/40     text-red-300     border-red-700',     icon: Target    },
-
-  // =============================== OS / Platforms ===============================
-  { keywords: ['linux'],            label: 'Linux',    color: 'bg-orange-950/40 text-orange-300 border-orange-700', icon: Terminal },
-  { keywords: ['windows'],          label: 'Windows',  color: 'bg-blue-950/40   text-blue-300   border-blue-700',   icon: Monitor  },
-  { keywords: ['active-directory', 'ad'], label: 'AD', color: 'bg-blue-950/40   text-blue-300   border-blue-700',   icon: Server   },
-  { keywords: ['htb', 'hackthebox'],        label: 'HTB',        color: 'bg-green-950/40  text-green-300  border-green-700',   icon: Server   },
-  { keywords: ['thm', 'tryhackme'],         label: 'THM',        color: 'bg-red-950/40    text-red-300    border-red-700',     icon: Server   },
-
-  // =============================== Status ===============================
-  { keywords: ['in progress', 'in-progress'], label: 'In Progress', color: 'bg-amber-950/40  text-amber-300  border-amber-600',  icon: Loader2      },
-  { keywords: ['completed'],                  label: 'Completed',   color: 'bg-green-950/40  text-green-300  border-green-700',  icon: Trophy       },
-  { keywords: ['archived'],                   label: 'Archived',    color: 'bg-neutral-900   text-neutral-400 border-neutral-700', icon: FileText   },
-
-  // =============================== Misc ===============================
-  { keywords: ['misc'],              label: 'Misc',       color: 'bg-neutral-900   text-neutral-400 border-neutral-700', icon: Layers   },
-  { keywords: ['tool'],              label: 'Tool',       color: 'bg-neutral-900   text-neutral-400 border-neutral-700', icon: Wrench   },
-  { keywords: ['writeup', 'write-up'], label: 'Write-up', color: 'bg-green-950/40  text-green-300  border-green-700',   icon: BookOpen },
-  { keywords: ['lab'],               label: 'Lab',        color: 'bg-purple-950/40 text-purple-300 border-purple-700',  icon: FlaskConical },
-  { keywords: ['challenge'],         label: 'Challenge',  color: 'bg-yellow-950/40 text-yellow-300 border-yellow-700',  icon: Swords  },
-];
-
-
-const key = tag.toLowerCase().trim();
-const match = definitions.find(d => d.keywords.includes(key));
-const color = match?.color;
-const Icon  = match?.icon ?? Hash;
-const label = match?.label ?? tag;
+const { color, icon: Icon, label } = resolveTag(tag);
 ---
 
 <BadgePrimitive color={color} className={className} client:load>
