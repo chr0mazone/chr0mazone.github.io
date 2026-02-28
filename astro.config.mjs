@@ -1,6 +1,7 @@
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import expressiveCode from 'astro-expressive-code';
+import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers'
 import react from '@astrojs/react';
 import tailwindcss from '@tailwindcss/vite';
 import { remarkMermaid } from './src/lib/remark-mermaid.mjs';
@@ -21,10 +22,10 @@ export default defineConfig({
         uiFontFamily: 'JetBrains Mono, Consolas, monospace',
       },
       defaultProps: {
-        showLineNumbers: true,
+        showLineNumbers: false,
         wrap: false,
       },
-      plugins: [],
+      plugins: [pluginLineNumbers()],
     }),
     mdx(),
   ],
