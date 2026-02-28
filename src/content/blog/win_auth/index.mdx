@@ -20,6 +20,7 @@ Before we dive into Windows authentication and how it works, we must first under
 
 ### WinLogon
 
+WinLogon
 
 
 ### LogonUI 
@@ -32,7 +33,7 @@ Before we dive into Windows authentication and how it works, we must first under
 
 
 
-## LSA, LSASS and Authentication Packages
+## LSA and LSASS
 
 <Callout type='tldr' collapsed>
 LSA is an overall security architecture which enforces security policies and authenticate users. LSASS is the process which implements LSA functionalities. Runs as `lsass.exe` and pulls authentication packages (modular libraries --`.ddl`s), when needed depending on environment (Workgroup/AD).
@@ -61,6 +62,15 @@ The LSA, having a list of these authentication packages, does not know what any 
 
 </Callout>
 
+A few examples of what LSA does include:
+
+- Registering a user and storing their credentials.
+- Validating user credentials against the SAM database.
+- Creating *access tokens* to enforce access control decisions.
+- Enforces local security policy (eg. account lockout settings and logon restrictions).
+
+...to name a few. We'll get into the buzzwords in a minute.
+
 ### LSASS
 
 While LSA is the overarching security architecture, **Local Security Authority Subsystem Service (LSASS)** (`%WINDIR%\System32\lsass.exe`) is the process that implements LSA functionality, running as a **Protected Process Light (PPL)**. Marking LSASS as a PPL prevents it from being tampered with by non-administrative processes -- we can achieve this by navigating to the registry key located at `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa` and assigning it a value `RunAsPPL` with the data `1`.
@@ -71,16 +81,9 @@ On modern Windows 10/11 and Server 2019+, LSASS runs as PPL by default. We can v
 Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa" -Name "RunAsPPL"
 ```
 
-### More on LSA, Workgroups and AD
+### Workgroups and AD
 
-A few examples of what LSA does include:
-
-- Registering a user and storing their credentials.
-- Validating user credentials against the SAM database.
-- Creating *access tokens* to enforce access control decisions.
-- Enforces local security policy (eg. account lockout settings and logon restrictions).
-
-...to name a few. We'll get into the buzzwords in a minute. How the LSA acts primarily depends on the type of network setup, and there are two main types:
+How the LSA acts primarily depends on the type of network setup, and there are two main types:
 
 1. **Local/workgroup**: These are found in small offices or in houses. One such example is a Laptop running Windows, a printer and a NAS server all connected to each other in a home LAN network. These devices communicate with each other to access shared resources. 
 2. **Active Directory (AD)**: AD is essentially an infrastructure designed by Microsoft to centralize and organize network resources in Windows-based   environments. You'll find these in larger offices like *enterprise environments*.
@@ -94,9 +97,9 @@ While they sound similar, there are a few differences to keep in mind.
 |Every machine manages its own users, credentials, and policies independently.|Group policies, access control and security settings enforced by the DC on every device (domain-joined machine) connected to it.|
 |Scales horrendously which is why it's used in smaller setups|Designed to scale thousands of machines and users|
 
-<Callout type="tip" title="AD analogy using Severance as a reference" collapsed>
+{/* <Callout type="tip" title="AD analogy using Severance as a reference" collapsed>
 Here's a great analogy of how an AD environment works. If you've watched Severance, then you probably know how Harmony Cobel manages the severed workers in the severed floor (Mark, Helly, Dylan, Irving, etc.). Using this you can think of Harmony Cobel as the DC, the severed floor as the domain, and the severed workers as the domain-joined devices connected to the DC. This would also imply that other departments in Lumon would also be domains with their own Harmony Cobels (DCs) and staff (devices). It's important to note that in actual AD environments, you might find more than one domain controller syncing the same data and enforcing the same policies for redundancy. 
-</Callout>
+</Callout> */}
 
 Getting back to LSA, now that we've seen the two common setups we can understand how LSA's operations differ.
 
@@ -115,9 +118,6 @@ SAM and NTDS.dit are credential stores. SAM is found on individual machines in w
 
 
 ## Authentication types [**WIP**]
-
-> TL;DR: LM is crackable so deprecated. NTLM uses challeng-response mechanism to authenticate a user without having the password sent over the network. Kerberos provide users with tickets (reusable stuff) which they can use to authenticate with network resources.
-
 
 ```mermaid
 graph LR
