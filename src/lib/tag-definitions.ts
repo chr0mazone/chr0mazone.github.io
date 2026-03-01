@@ -4,8 +4,11 @@ import {
   BookOpen, Hash, Database, Binary, Layers, Wrench,
   FileText, Network, Key, Skull, Target, Loader2,
   FlaskConical, Swords, Trophy,
+  Syringe,
+  Cog,
 } from 'lucide-react';
 import type { ComponentType } from 'react';
+import { server } from 'typescript';
 
 export interface TagDef {
   keywords: string[];
@@ -19,12 +22,13 @@ export const TAG_DEFS: TagDef[] = [
   { keywords: ['rust'],                             label: 'Rust',        color: 'bg-orange-950/40 text-orange-300 border-orange-700',   icon: Cpu       },
   { keywords: ['python'],                           label: 'Python',      color: 'bg-blue-950/40   text-blue-300   border-blue-700',     icon: Code      },
   { keywords: ['javascript', 'js'],                 label: 'JS',          color: 'bg-yellow-950/40 text-yellow-300 border-yellow-700',   icon: Code      },
+  { keywords: ['php'],                 label: 'PHP',          color: 'bg-purple-950/40 text-purple-300 border-purple-700',   icon: Server      },
 
   // =============================== CTFs ===============================
   { keywords: ['ctf'],                              label: 'CTF',         color: 'bg-green-950/40  text-green-300  border-green-700',    icon: Flag      },
   { keywords: ['pwn'],                              label: 'Pwn',         color: 'bg-red-950/40    text-red-300    border-red-700',      icon: Zap       },
   { keywords: ['bof'],                              label: 'BoF',         color: 'bg-orange-950/40 text-orange-300 border-orange-700',   icon: Zap       },
-  { keywords: ['rev', 're'],                        label: 'RE',          color: 'bg-purple-950/40 text-purple-300 border-purple-700',   icon: Search    },
+  { keywords: ['rev', 're'],                        label: 'RE',          color: 'bg-orange-950/40 text-orange-300 border-orange-700',   icon: Cog    },
   { keywords: ['osint'],                            label: 'OSINT',       color: 'bg-cyan-950/40   text-cyan-300   border-cyan-700',     icon: Eye       },
   { keywords: ['network'],                          label: 'Network',     color: 'bg-blue-950/40   text-blue-300   border-blue-700',     icon: Wifi      },
   { keywords: ['crypto'],                           label: 'Crypto',      color: 'bg-purple-950/40 text-purple-300 border-purple-700',   icon: Lock      },
@@ -56,6 +60,7 @@ export const TAG_DEFS: TagDef[] = [
   { keywords: ['lab'],                              label: 'Lab',         color: 'bg-purple-950/40 text-purple-300 border-purple-700',   icon: FlaskConical },
   { keywords: ['challenge'],                        label: 'Challenge',   color: 'bg-yellow-950/40 text-yellow-300 border-yellow-700',   icon: Swords    },
   { keywords: ['privesc'],                 label: 'PrivEsc',    color: 'bg-yellow-950/40 text-yellow-300 border-yellow-700', icon: Key     },
+  { keywords: ['injection'], label: 'Injection', color: 'bg-red-950/40 text-red-300 border-red-700' , icon: Syringe}
 ];
 
 export function resolveTag(tag: string) {

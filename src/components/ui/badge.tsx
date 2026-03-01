@@ -17,7 +17,7 @@ export function Badge({ className, color, children, ...props }: BadgeProps) {
         // Icon sizing via Tailwind selector
         '[&>svg]:size-3 [&>svg]:shrink-0 [&>svg]:block',
         // Default color (grey) if none provided
-        color ?? 'bg-neutral-900 text-neutral-400 border-neutral-700',
+        color ?? 'bg-teal-900 text-teal-200 border-teal-500',
         className,
       )}
       {...props}
